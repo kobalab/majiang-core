@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/kobalab/majiang-core/issues"
   },
-  "homepage": "https://github.com/kobalab/majiang-core#readme"
+  "homepage": "https://github.com/kobalab/majiang-core#readme",
+  "devDependencies": {
+    "mocha": "^8.3.2"
+  }
 }
