@@ -10,7 +10,10 @@
     "type": "git",
     "url": "git+https://github.com/kobalab/majiang-core.git"
   },
-  "keywords": ["麻雀","電脳麻将"],
+  "keywords": [
+    "麻雀",
+    "電脳麻将"
+  ],
   "author": "Satoshi Kobayashi",
   "license": "MIT",
   "bugs": {
@@ -18,6 +21,7 @@
   },
   "homepage": "https://github.com/kobalab/majiang-core#readme",
   "devDependencies": {
-    "mocha": "^8.3.2"
+    "mocha": "^8.3.2",
+    "nyc": "^15.1.0"
   }
 }
