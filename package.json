@@ -1,0 +1,20 @@
+{
+  "name": "@kobalab/majiang-core",
+  "version": "0.0.1",
+  "description": "麻雀基本ライブラリ",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kobalab/majiang-core.git"
+  },
+  "keywords": ["麻雀","電脳麻将"],
+  "author": "Satoshi Kobayashi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kobalab/majiang-core/issues"
+  },
+  "homepage": "https://github.com/kobalab/majiang-core#readme"
+}
