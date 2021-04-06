@@ -21,6 +21,8 @@ const Majiang = require('@kobalab/majiang-core');
 | ``Majiang.Util``    | シャンテン数計算、和了点計算ルーチン |
 | ``Majiang.Game``    | 局進行を実現するクラス               |
 
+[API仕様](https://github.com/kobalab/majiang-core/wiki)
+
 ## ライセンス
 [MIT](https://github.com/kobalab/majiang-core/blob/master/LICENSE)
 
