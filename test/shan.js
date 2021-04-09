@@ -2,17 +2,8 @@ const assert = require('assert');
 
 const Majiang = require('../');
 
-function Shan(rule = {}) {
-    let _rule = {
-        '赤牌': { m: 1, p: 1, s: 1 },
-        'カンドラあり': true,
-        '裏ドラあり': true,
-        'カン裏あり': true,
-    };
-    for (let key of Object.keys(rule)) {
-        _rule[key] = rule[key];
-    }
-    return new Majiang.Shan(_rule);
+function Shan(rule) {
+    return new Majiang.Shan(Majiang.rule(rule));
 }
 
 suite('Majiang.Shan', ()=>{
