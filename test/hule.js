@@ -25,6 +25,102 @@ function param(opt = {}) {
 
 suite('Majiang.Util', function(){
 
+    suite('hule_mianzi(shoupai, rongpai)', ()=>{
+        test('一般手(ツモ和了)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m123p055s789z11122'), null),
+                [ ['z22_!','m123','p555','s789','z111'] ]));
+        test('一般手(ロン和了)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m123p055s789z1112'), 'z2+'),
+                [ ['z22+!','m123','p555','s789','z111'] ]));
+        test('一般手(副露あり)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m123p055z1112,s7-89'), 'z2='),
+                [ ['z22=!','m123','p555','z111','s7-89'] ]));
+        test('七対子形', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m225p4466s1199z33'), 'm0-'),
+                [ ['m22','m55-!','p44','p66','s11','s99','z33'] ]));
+        test('国士無双形(ツモ)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m9p19s19z12345677m1'), null),
+                [ ['z77','m1_!','m9','p1','p9','s1','s9',
+                   'z1','z2','z3','z4','z5','z6'] ]));
+        test('国士無双形(13面待ちロン)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m19p19s19z1234567'), 'm9+'),
+                [ ['m99+!','m1','p1','p9','s1','s9',
+                   'z1','z2','z3','z4','z5','z6','z7'] ]));
+        test('九蓮宝燈形', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m1112345678999'), 'm0='),
+                [ ['m55=!','m111','m234','m678','m999'],
+                  ['m11123456789995=!'] ]));
+        test('和了形以外(少牌)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m123p055s789z1122')),
+                []));
+        test('和了形以外(三面子)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('___m123p055z2,s7-89'), 'z2='),
+                []));
+        test('和了形以外(一対子)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m22')),
+                []));
+        test('和了形以外(国士無双テンパイ)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m19p19s19z123456'), 'z7='),
+                []));
+        test('和了形以外(九蓮宝燈テンパイ)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m111234567899'), 'm9='),
+                []));
+        test('複数の和了形(二盃口か七対子か)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m223344p556677s88')),
+                [ ['s88_!','m234','m234','p567','p567'],
+                  ['m22','m33','m44','p55','p66','p77','s88_!'] ]));
+        test('複数の和了形(順子か刻子か)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m111222333p89997')),
+                [ ['p99','m123','m123','m123','p7_!89'],
+                  ['p99','m111','m222','m333','p7_!89'] ]));
+        test('複数の和了形(雀頭の選択、平和かサンショクか)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m2234455p234s234m3')),
+                [ ['m22','m3_!45','m345','p234','s234'],
+                  ['m55','m23_!4','m234','p234','s234'] ]));
+        test('複数の和了形(暗刻を含む形)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m23p567s33345666m1')),
+                [ ['s33','m1_!23','p567','s345','s666'],
+                  ['s66','m1_!23','p567','s333','s456'] ]));
+        test('複数の和了形(九蓮宝燈形)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('s1113445678999s2')),
+                [ ['s99','s111','s2_!34','s456','s789'],
+                  ['s11134456789992_!'] ]));
+    });
+
   suite('hule(shoupai, rongpai, param)', function(){
 
     let hule;
