@@ -1408,4 +1408,28 @@ suite('Majiang.Util', ()=>{
             }
         });
     });
+
+    suite('ルール変更', ()=>{
+
+        let hule;
+
+        suite('クイタンなし', ()=>{
+            test('クイタンは役とならない', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m22555p234s78,p777-'),
+                            's6=',
+                            param({rule:Majiang.rule({'クイタンあり':false})}));
+                assert.ifError(hule.hupai);
+            });
+            test('門前ならOK', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m22555p234777s78'),
+                            's6=',
+                            param({rule:Majiang.rule({'クイタンあり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '断幺九', fanshu: 1 }],
+                              fu: 40, fanshu: 1, damanguan: null, defen: 1300,
+                              fenpei: [ 0,  1300, 0, -1300]});
+        });
+    });
 });
