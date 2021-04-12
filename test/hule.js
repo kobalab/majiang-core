@@ -703,8 +703,8 @@ suite('Majiang.Util', ()=>{
         });
         test('ドラ: 手牌内: 1, 副露内: 1', ()=>{
             hule = Majiang.Util.hule(
-                        Majiang.Shoupai.fromString('p55m234s78,m4-56,z111+'),
-                        's9=', param({baopai:['m3']}));
+                        Majiang.Shoupai.fromString('p55m23s789,m4-56,z111+'),
+                        'm4=', param({baopai:['m3']}));
             assert.deepEqual(hule.hupai, [{ name: '場風 東', fanshu: 1 },
                                           { name: 'ドラ',    fanshu: 2 }]);
         });
