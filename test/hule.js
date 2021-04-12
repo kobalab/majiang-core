@@ -7,6 +7,7 @@ const data = require('./data/hule.json');
 function param(opt = {}) {
 
     let param = {
+        rule:       Majiang.rule(),
         zhuangfeng: 0,
         menfeng:    1,
         hupai:      {},
@@ -1402,7 +1403,7 @@ suite('Majiang.Util', ()=>{
             for (let t of data) {
                 hule = Majiang.Util.hule(
                             Majiang.Shoupai.fromString(t.in.shoupai),
-                            t.in.rongpai, t.in.param);
+                            t.in.rongpai, param(t.in.param));
                 assert.deepEqual(hule, t.out, t.in.shoupai);
             }
         });
