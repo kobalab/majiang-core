@@ -1430,6 +1430,49 @@ suite('Majiang.Util', ()=>{
                             { hupai: [{ name: '断幺九', fanshu: 1 }],
                               fu: 40, fanshu: 1, damanguan: null, defen: 1300,
                               fenpei: [ 0,  1300, 0, -1300]});
+            });
+        });
+        suite('切り上げ満貫あり', ()=>{
+            test('30符 3翻 親 ツモ → 2000∀ (切り上げなし)', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m22z111p445566s789'),
+                            null,
+                            param({zhuangfeng:1,menfeng:0,
+                                   rule:Majiang.rule(
+                                            {'切り上げ満貫あり':true})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '門前清自摸和', fanshu: 1 },
+                                      { name: '自風 東',     fanshu: 1 },
+                                      { name: '一盃口',      fanshu: 1 }],
+                              fu: 30, fanshu: 3, damanguan: null, defen: 6000,
+                              fenpei: [  6000, -2000, -2000, -2000]});
+            });
+            test('30符 4翻 子 ツモ → 2000/4000', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m11z111p123789s789'),
+                            null,
+                            param({rule:Majiang.rule(
+                                            {'切り上げ満貫あり':true})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '門前清自摸和', fanshu: 1 },
+                                      { name: '場風 東',     fanshu: 1 },
+                                      { name: '混全帯幺九',   fanshu: 2 }],
+                              fu: 30, fanshu: 4, damanguan: null, defen: 8000,
+                              fenpei: [ -4000,  8000, -2000, -2000]});
+            });
+            test('60符 3翻 親 ツモ → 4000∀', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m11222789,z2222,m444='),
+                            null,
+                            param({zhuangfeng:1,menfeng:0,
+                                   rule:Majiang.rule(
+                                            {'切り上げ満貫あり':true})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '場風 南',     fanshu: 1 },
+                                      { name: '混一色',      fanshu: 2 }],
+                              fu: 60, fanshu: 3, damanguan: null, defen: 12000,
+                              fenpei: [ 12000, -4000, -4000, -4000]});
+            });
         });
     });
 });
