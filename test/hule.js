@@ -1536,6 +1536,24 @@ suite('Majiang.Util', ()=>{
                               fenpei: [  0, 64000, 0, -64000]});
             });
         });
+        suite('数え役満なし', ()=>{
+            test('13翻も3倍満とする', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('p22334455667788*'),
+                            null,
+                            param({lizhi:1,
+                                   rule:Majiang.rule({'数え役満あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '立直',        fanshu: 1 },
+                                      { name: '門前清自摸和', fanshu: 1 },
+                                      { name: '平和',        fanshu: 1 },
+                                      { name: '断幺九',      fanshu: 1 },
+                                      { name: '二盃口',      fanshu: 3 },
+                                      { name: '清一色',      fanshu: 6 }],
+                              fu: 20, fanshu: 13, damanguan: null, defen: 24000,
+                              fenpei: [-12000, 24000, -6000, -6000]});
+            })
+        });
         suite('切り上げ満貫あり', ()=>{
             test('30符 3翻 親 ツモ → 2000∀ (切り上げなし)', ()=>{
                 hule = Majiang.Util.hule(
