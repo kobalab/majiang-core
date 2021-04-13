@@ -1432,6 +1432,52 @@ suite('Majiang.Util', ()=>{
                               fenpei: [ 0,  1300, 0, -1300]});
             });
         });
+        suite('ダブル役満なし', ()=>{
+            test('国士無双十三面', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m19p19s19z1234567'),
+                            'm1+',
+                            param({rule:Majiang.rule({'ダブル役満あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '国士無双十三面', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [  0, 32000, -32000, 0]});
+            });
+            test('四暗刻単騎', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m111p333s777z111m3'),
+                            'm3=',
+                            param({rule:Majiang.rule({'ダブル役満あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '四暗刻単騎', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [  0, 32000, 0, -32000]});
+            });
+            test('大四喜', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m22z22244,z333+,z111-'),
+                            'z4=',
+                            param({rule:Majiang.rule({'ダブル役満あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '大四喜', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [  0, 32000, 0, -32000]});
+            });
+            test('純正九蓮宝燈', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString('m1112345678999'),
+                            'm2=',
+                            param({rule:Majiang.rule({'ダブル役満あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '純正九蓮宝燈', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [  0, 32000, 0, -32000]});
+            });
+        });
         suite('切り上げ満貫あり', ()=>{
             test('30符 3翻 親 ツモ → 2000∀ (切り上げなし)', ()=>{
                 hule = Majiang.Util.hule(
