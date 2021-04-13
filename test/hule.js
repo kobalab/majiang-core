@@ -1478,6 +1478,38 @@ suite('Majiang.Util', ()=>{
                               fenpei: [  0, 32000, 0, -32000]});
             });
         });
+        suite('役満の複合なし', ()=>{
+            test('ダブル役満 + 役満複合 + パオ (ツモ和了)', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString(
+                                                'z77,z111-,z2222,z333=3,z444+'),
+                            null,
+                            param({lizhibang:1,changbang:1,
+                                   rule:Majiang.rule({'役満の複合あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [
+                                { name: '大四喜', fanshu: '**', baojia: '+' },
+                                { name: '字一色', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [ 0, 33300, -32300, 0]});
+            });
+            test('ダブル役満 + 役満複合 + パオ (ロン和了)', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString(
+                                                'z7,z111-,z2222,z333=3,z444+'),
+                            'z7-',
+                            param({lizhibang:1,changbang:1,
+                                   rule:Majiang.rule({'役満の複合あり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [
+                                { name: '大四喜', fanshu: '**', baojia: '+' },
+                                { name: '字一色', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [ -16300, 33300, -16000, 0]});
+            });
+        });
         suite('役満パオなし', ()=>{
             test('大三元', ()=>{
                 hule = Majiang.Util.hule(
