@@ -1478,6 +1478,32 @@ suite('Majiang.Util', ()=>{
                               fenpei: [  0, 32000, 0, -32000]});
             });
         });
+        suite('役満パオなし', ()=>{
+            test('大三元', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString(
+                                                    'm2234,z555-5,z6666,z777+'),
+                            'm5=',
+                            param({rule:Majiang.rule({'役満パオあり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '大三元', fanshu: '*' }],
+                              fu: null, fanshu: null,
+                              damanguan: 1, defen: 32000,
+                              fenpei: [  0, 32000, 0, -32000]});
+            });
+            test('大四喜', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString(
+                                                'm2,z222+,z4444,z333+,z111-'),
+                            'm2=',
+                            param({rule:Majiang.rule({'役満パオあり':false})}));
+                assert.deepEqual(hule,
+                            { hupai: [{ name: '大四喜', fanshu: '**' }],
+                              fu: null, fanshu: null,
+                              damanguan: 2, defen: 64000,
+                              fenpei: [  0, 64000, 0, -64000]});
+            });
+        });
         suite('切り上げ満貫あり', ()=>{
             test('30符 3翻 親 ツモ → 2000∀ (切り上げなし)', ()=>{
                 hule = Majiang.Util.hule(
