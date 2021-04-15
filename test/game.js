@@ -22,7 +22,33 @@ suite('Majiang.Game', ()=>{
     test('クラスが存在すること', ()=> assert.ok(Majiang.Game));
 
     suite('constructor(players, callback, rule)', ()=>{
-        test('インスタンスが生成できること', ()=> assert.ok(new Majiang.Game()));
+
+        const game = new Majiang.Game();
+        const rule = Majiang.rule();
+
+        test('インスタンスが生成できること', ()=> assert.ok(game));
+        test('タイトルが設定されていること', ()=> assert.ok(game._model.title));
+        test('タイトルが設定可能なこと', ()=>{
+            const game = new Majiang.Game([], null, rule, 'タイトル');
+            assert.equal(game._model.title, 'タイトル');
+        });
+        test('対局者名が設定されていること', ()=>
+            assert.deepEqual(game._model.player, ['私','下家','対面','上家']));
+        test('局数が初期化されていること', ()=>{
+            assert.equal(game._model.zhuangfeng, 0);
+            assert.equal(game._model.jushu, 0);
+        });
+        test('供託が初期化されていること', ()=>{
+            assert.equal(game._model.changbang, 0);
+            assert.equal(game._model.lizhibang, 0);
+        });
+        test('持ち点が初期化されていること', ()=>
+            assert.deepEqual(game._model.defen, [25000,25000,25000,25000]));
+        test('持ち点が変更可能なこと', ()=>{
+            const rule = Majiang.rule({'配給原点':30000});
+            const game = new Majiang.Game([], null, rule);
+            assert.deepEqual(game._model.defen, [30000,30000,30000,30000]);
+        });
     });
 
     suite('delay(callback, timeout)', ()=>{
