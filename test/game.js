@@ -279,4 +279,131 @@ suite('Majiang.Game', ()=>{
                 []);
         });
     });
+
+    suite('static allow_lizhi(rule, shoupai, p, paishu, defen)', ()=>{
+
+        const rule = Majiang.rule();
+
+        test('打牌できない場合、リーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z1122');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai));
+        });
+        test('すでにリーチしている場合、リーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11223*');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai));
+        });
+        test('メンゼンでない場合、リーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z23,z111=');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai));
+        });
+        test('ツモ番がない場合、リーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11223');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai, 'z3', 3));
+        });
+        test('ルールが許せばツモ番がなくてもリーチは可能', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11223');
+            assert.ok(Majiang.Game.allow_lizhi(
+                            Majiang.rule({'ツモ番なしリーチあり':true}),
+                            shoupai, 'z3', 3));
+        });
+        test('持ち点が1000点に満たない場合、リーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11223');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai, 'z3', 4, 900));
+        });
+        test('トビなしなら持ち点が1000点に満たなくてもリーチは可能', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11223');
+            assert.ok(Majiang.Game.allow_lizhi(
+                            Majiang.rule({'トビ終了あり':false}),
+                            shoupai, 'z3', 4, 900));
+        });
+        test('テンパイしていない場合、リーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11234');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai));
+        });
+        test('形式テンパイと認められない牌姿でリーチはできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11112');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai, 'z2'));
+        });
+        test('指定された打牌でリーチ可能な場合、真を返すこと', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11112');
+            assert.ok(Majiang.Game.allow_lizhi(rule, shoupai, 'z1'));
+        });
+        test('打牌が指定されていない場合、リーチ可能な打牌一覧を返す', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s788z11122');
+            assert.deepEqual(Majiang.Game.allow_lizhi(rule, shoupai),
+                             ['s7','s8']);
+            shoupai = Majiang.Shoupai.fromString('m123p456s789z11223');
+            assert.deepEqual(Majiang.Game.allow_lizhi(rule, shoupai),
+                             ['z3_']);
+        });
+        test('リーチ可能な打牌がない場合、false を返す', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m11112344449999');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai));
+        });
+    });
+
+    suite('static allow_hule(shoupai, p, zhuangfeng, menfeng, '
+                                                + 'hupai, neng_rong)', ()=>{
+        const rule = Majiang.rule();
+
+        test('フリテンの場合、ロン和了できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(! Majiang.Game.allow_hule(
+                                rule, shoupai, 'z1=', 0, 1, false, false));
+        });
+        test('和了形になっていない場合、和了できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z11223,s789-');
+            assert.ok(! Majiang.Game.allow_hule(
+                                rule, shoupai, null, 0, 1, false, true));
+        });
+        test('役あり和了形の場合、和了できる', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z3377');
+            assert.ok(Majiang.Game.allow_hule(
+                                rule, shoupai, 'z3+', 0, 1, true, true));
+        });
+        test('役なし和了形の場合、和了できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z3377');
+            assert.ok(! Majiang.Game.allow_hule(
+                                rule, shoupai, 'z3+', 0, 1, false, true));
+        });
+        test('クイタンなしの場合、クイタンでは和了できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m22555p234s78,p777-');
+            assert.ok(! Majiang.Game.allow_hule(
+                                Majiang.rule({'クイタンあり':false}),
+                                shoupai, 's6=', 0, 1, false, true));
+        });
+        test('ツモ和了', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z33377');
+            assert.ok(Majiang.Game.allow_hule(
+                                rule, shoupai, null, 0, 1, false, false));
+        });
+        test('ロン和了', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(Majiang.Game.allow_hule(
+                                rule, shoupai, 'z1=', 0, 1, false, true));
+        });
+    });
+
+    suite('static allow_pingju(rule, shoupai, diyizimo)', ()=>{
+
+        const rule = Majiang.rule();
+
+        test('第一ツモでない場合、九種九牌とならない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
+            assert.ok(! Majiang.Game.allow_pingju(rule, shoupai, false));
+        });
+        test('途中流局なし場合、九種九牌とならない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
+            assert.ok(! Majiang.Game.allow_pingju(
+                            Majiang.rule({'途中流局あり':false}), shoupai, true));
+        });
+        test('八種九牌は流局にできない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m1234567z1234567');
+            assert.ok(! Majiang.Game.allow_pingju(rule, shoupai, true));
+        });
+        test('九種九牌', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
+            assert.ok(Majiang.Game.allow_pingju(rule, shoupai, true));
+        });
+    });
 });
