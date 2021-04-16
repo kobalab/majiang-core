@@ -177,6 +177,51 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('kaiju(qijia)', ()=>{
+
+        const players = [0,1,2,3].map(id => new Player(id));
+        const rule = Majiang.rule();
+        const game = new Majiang.Game(players, rule);
+        game.view = new View();
+        game._speed = 0;
+        game.stop();
+
+        test('起家が設定されること', ()=>{
+            MSG =[];
+            game.kaiju(1);
+            assert.equal(game._model.qijia, 1);
+        });
+        test('牌譜が初期化されること', ()=>{
+            assert.equal(game._paipu.title, game._model.title);
+            assert.deepEqual(game._paipu.player, game._model.player);
+            assert.equal(game._paipu.qijia, game._model.qijia);
+            assert.equal(game._paipu.log.length, 0);
+        });
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { kaiju: null }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let id = 0; id < 4; id++) {
+                let msg = {
+                    kaiju: {
+                        id:     id,
+                        rule:   game._rule,
+                        player: game._model.player,
+                        qijia:  1
+                    }
+                };
+                assert.deepEqual(MSG[id], msg);
+            }
+            done();
+        }, 0));
+        test('起家を乱数で設定できること', ()=>{
+            game.kaiju();
+            assert.ok(game._model.qijia == 0 ||
+                      game._model.qijia == 1 ||
+                      game._model.qijia == 2 ||
+                      game._model.qijia == 3);
+        });
+    });
+
     suite('static get_dapai(rule, shoupai)', ()=>{
 
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
