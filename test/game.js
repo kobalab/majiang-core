@@ -17,6 +17,10 @@ class Player {
     }
 }
 
+class View {
+    kaiju(param) { this._param = { kaiju: param } }
+}
+
 suite('Majiang.Game', ()=>{
 
     test('クラスが存在すること', ()=> assert.ok(Majiang.Game));
