@@ -23,7 +23,7 @@ class View {
     update(param) { this._param = { update: param } }
 }
 
-function init_game() {
+function init_game(param = {}) {
 
     const players = [0,1,2,3].map(id => new Player(id));
     const game = new Majiang.Game(players);
@@ -32,6 +32,15 @@ function init_game() {
     game.stop();
     game.kaiju();
     game.qipai();
+
+    if (param.shoupai) {
+        for (let l = 0; l < 4; l++) {
+            if (! param.shoupai[l]) continue;
+            let paistr = param.shoupai[l];
+            if (paistr == '_') paistr = '_'.repeat(13);
+            game.model.shoupai[l] = Majiang.Shoupai.fromString(paistr);
+        }
+    }
 
     return game;
 }
@@ -327,6 +336,33 @@ suite('Majiang.Game', ()=>{
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].dapai.l, game.model.lunban);
                 assert.equal(MSG[id].dapai.p, dapai);
+            }
+            done();
+        }, 0));
+    });
+
+    suite('fulou(fulou)', ()=>{
+
+        const game = init_game({shoupai:['_','_','','']});
+
+        test('河から副露牌が拾われること', ()=>{
+            game.zimo();
+            game.dapai('m2*');
+            game.fulou('m12-3');
+            assert.equal(game.model.he[0]._pai[0], 'm2*-');
+        });
+        test('手番が更新されること(上家からのチー)', ()=>
+            assert.equal(game.model.lunban, 1));
+        test('手牌が副露されること', ()=>
+            assert.equal(game.model.shoupai[1]._fulou[0], 'm12-3'));
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().fulou));
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].fulou.l, game.model.lunban);
+                assert.equal(MSG[id].fulou.m, 'm12-3');
             }
             done();
         }, 0));
