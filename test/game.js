@@ -268,6 +268,7 @@ suite('Majiang.Game', ()=>{
                 assert.equal(game.model.he[l]._pai.length, 0);
             }
         });
+        test('第一ツモ巡であること', ()=> assert.ok(game._diyizimo));
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().qipai));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { redraw: null }));
@@ -355,6 +356,7 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.model.lunban, 1));
         test('手牌が副露されること', ()=>
             assert.equal(game.model.shoupai[1]._fulou[0], 'm12-3'));
+        test('第一ツモ巡でなくなること', ()=> assert.ok(! game._diyizimo));
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().fulou));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
@@ -402,6 +404,7 @@ suite('Majiang.Game', ()=>{
         });
         test('手牌にツモ牌が加えられること', ()=>
             assert.ok(game.model.shoupai[0].get_dapai()));
+        test('第一ツモ巡でなくなること', ()=> assert.ok(! game._diyizimo));
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().gangzimo));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
