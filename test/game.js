@@ -18,7 +18,20 @@ class Player {
 }
 
 class View {
-    kaiju(param) { this._param = { kaiju: param } }
+    kaiju(param)  { this._param = { kaiju:  param } }
+    redraw(param) { this._param = { redraw: param } }
+}
+
+function init_game() {
+
+    const players = [0,1,2,3].map(id => new Player(id));
+    const game = new Majiang.Game(players);
+
+    game.view = new View();
+    game.stop();
+    game.kaiju();
+
+    return game;
 }
 
 suite('Majiang.Game', ()=>{
@@ -219,6 +232,47 @@ suite('Majiang.Game', ()=>{
                       game._model.qijia == 1 ||
                       game._model.qijia == 2 ||
                       game._model.qijia == 3);
+        });
+    });
+
+    suite('qipai(shan)', ()=>{
+
+        const game = init_game();
+
+        test('牌山が生成されること', ()=>{
+            game.qipai();
+            const shan = game.model.shan;
+            assert.equal(shan.paishu, 70);
+            assert.equal(shan.baopai.length, 1);
+            assert.ifError(shan.fubaopai);
+        });
+        test('配牌されること', ()=>{
+            for (let l = 0; l < 4; l++) {
+                assert.equal(game.model.shoupai[l]
+                                .toString().replace(/[mpsz]/g,'').length, 13);
+            }
+        });
+        test('河が初期化されること', ()=>{
+            for (let l = 0; l < 4; l++) {
+                assert.equal(game.model.he[l]._pai.length, 0);
+            }
+        });
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().qipai));
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { redraw: null }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].qipai.defen[l], 25000);
+                assert.ok(MSG[id].qipai.shoupai[l]);
+            }
+            done();
+        }, 0));
+        test('使用する牌山を指定できること', ()=>{
+            const shan = new Majiang.Shan(game._rule);
+            const shoupai = new Majiang.Shoupai(shan._pai.slice(-13));
+            game.qipai(shan);
+            assert.equal(game.model.shoupai[0].toString(), shoupai.toString());
         });
     });
 
