@@ -20,6 +20,7 @@ class Player {
 class View {
     kaiju(param)  { this._param = { kaiju:  param } }
     redraw(param) { this._param = { redraw: param } }
+    update(param) { this._param = { update: param } }
 }
 
 function init_game() {
@@ -30,6 +31,7 @@ function init_game() {
     game.view = new View();
     game.stop();
     game.kaiju();
+    game.qipai();
 
     return game;
 }
@@ -274,6 +276,34 @@ suite('Majiang.Game', ()=>{
             game.qipai(shan);
             assert.equal(game.model.shoupai[0].toString(), shoupai.toString());
         });
+    });
+
+    suite('zimo()', ()=>{
+
+        const game = init_game();
+
+        test('手番が更新されること', ()=>{
+            game.zimo();
+            assert.equal(game.model.lunban, 0);
+        });
+        test('牌山からツモられること', ()=>
+            assert.equal(game.model.shan.paishu, 69));
+        test('手牌にツモ牌が加えられること', ()=>
+            assert.ok(game.model.shoupai[0].get_dapai()));
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().zimo));
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].zimo.l, game.model.lunban);
+                if (l == game.model.lunban)
+                        assert.ok(MSG[id].zimo.p);
+                else    assert.ok(! MSG[id].zimo.p);
+            }
+            done();
+        }, 0));
+        test('ツモ牌がない場合、流局すること');
     });
 
     suite('static get_dapai(rule, shoupai)', ()=>{
