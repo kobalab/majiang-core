@@ -390,6 +390,33 @@ suite('Majiang.Game', ()=>{
         }, 0));
     });
 
+    suite('gangzimo()', ()=>{
+
+        const game = init_game({shoupai:['_','','','']});
+
+        test('牌山からツモられること', ()=>{
+            game.zimo();
+            game.gang('m5550');
+            game.gangzimo();
+            assert.equal(game.model.shan.paishu, 68);
+        });
+        test('手牌にツモ牌が加えられること', ()=>
+            assert.ok(game.model.shoupai[0].get_dapai()));
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().gangzimo));
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].gangzimo.l, game.model.lunban);
+                if (l == game.model.lunban)
+                        assert.ok(MSG[id].gangzimo.p);
+                else    assert.ok(! MSG[id].gangzimo.p);
+            }
+            done();
+        }, 0));
+    });
+
     suite('static get_dapai(rule, shoupai)', ()=>{
 
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
