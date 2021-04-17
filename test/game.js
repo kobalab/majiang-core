@@ -453,6 +453,31 @@ suite('Majiang.Game', ()=>{
         }, 0));
     });
 
+    suite('kakigang()', ()=>{
+
+        const game = init_game({shoupai:['__________,s555+','','','']});
+
+        test('槓ドラが増えること', ()=>{
+            game.zimo();
+            game.gang('s555+0');
+            game.gangzimo();
+            game.kaigang();
+            assert.equal(game.model.shan.baopai.length, 2);
+            assert.ok(! game._gang);
+        });
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().kaigang));
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].kaigang.baopai,
+                             game.model.shan.baopai.pop());
+            }
+            done();
+        }, 0));
+    });
+
     suite('static get_dapai(rule, shoupai)', ()=>{
 
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
