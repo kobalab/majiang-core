@@ -153,7 +153,7 @@ suite('Majiang.Game', ()=>{
 
         test('通知が伝わること', (done)=>{
             MSG = [];
-            game.notify_players(msg);
+            game.notify_players('type', msg);
             assert.equal(MSG.length, 0);
             setTimeout(()=>{
                 assert.deepEqual(MSG, msg);
