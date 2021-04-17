@@ -26,7 +26,8 @@ class View {
 function init_game(param = {}) {
 
     const players = [0,1,2,3].map(id => new Player(id));
-    const game = new Majiang.Game(players);
+    const rule = param.rule || Majiang.rule();
+    const game = new Majiang.Game(players, null, rule);
 
     game.view = new View();
     game.stop();
@@ -269,6 +270,7 @@ suite('Majiang.Game', ()=>{
             }
         });
         test('第一ツモ巡であること', ()=> assert.ok(game._diyizimo));
+        test('四風連打中であること', ()=> assert.ok(game._fengpai));
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().qipai));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { redraw: null }));
@@ -280,11 +282,18 @@ suite('Majiang.Game', ()=>{
             }
             done();
         }, 0));
+
         test('使用する牌山を指定できること', ()=>{
             const shan = new Majiang.Shan(game._rule);
             const shoupai = new Majiang.Shoupai(shan._pai.slice(-13));
             game.qipai(shan);
             assert.equal(game.model.shoupai[0].toString(), shoupai.toString());
+        });
+        test('途中流局なしの場合、最初から四風連打中でないこと', ()=>{
+            const rule = Majiang.rule({'途中流局あり':false});
+            const game = init_game({rule:rule});
+            game.qipai();
+            assert.ok(! game._fengpai);
         });
     });
 
@@ -340,6 +349,30 @@ suite('Majiang.Game', ()=>{
             }
             done();
         }, 0));
+
+        test('風牌以外の打牌で四風連打中でなくなること', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game.zimo();
+            game.dapai('m1');
+            assert.ok(! game._fengpai);
+        });
+        test('異なる風牌の打牌で四風連打中でなくなること', ()=>{
+            const game = init_game({shoupai:['_','_','','']});
+            game.zimo();
+            game.dapai('z1');
+            game.zimo();
+            game.dapai('z2');
+            assert.ok(! game._fengpai);
+        });
+        test('第一ツモ巡終了で四風連打中でなくなること', ()=>{
+            const game = init_game({shoupai:['_','_','','']});
+            game.zimo();
+            game.dapai('z1');
+            game.zimo();
+            game._diyizimo = false;
+            game.dapai('z1');
+            assert.ok(! game._fengpai);
+        });
     });
 
     suite('fulou(fulou)', ()=>{
