@@ -373,6 +373,14 @@ suite('Majiang.Game', ()=>{
             game.dapai('z1');
             assert.ok(! game._fengpai);
         });
+        test('加槓後の打牌で開槓されること', ()=>{
+            const game = init_game({shoupai:['__________,s333=','','','']});
+            game.zimo();
+            game.gang('s333=3');
+            game.gangzimo();
+            game.dapai('p1');
+            assert.equal(game.model.shan.baopai.length, 2);
+        });
     });
 
     suite('fulou(fulou)', ()=>{
@@ -401,6 +409,14 @@ suite('Majiang.Game', ()=>{
             }
             done();
         }, 0));
+
+        test('大明槓が副露されること', ()=>{
+            const game = init_game({shoupai:['_','','','_']});
+            game.zimo();
+            game.dapai('m2');
+            game.fulou('m2222+');
+            assert.equal(game.model.shoupai[3]._fulou[0], 'm2222+');
+        });
     });
 
     suite('gang(gang)', ()=>{
@@ -423,6 +439,21 @@ suite('Majiang.Game', ()=>{
             }
             done();
         }, 0));
+
+        test('暗槓が副露されること', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game.zimo();
+            game.gang('s5550');
+            assert.equal(game.model.shoupai[0]._fulou[0], 's5550');
+        });
+        test('後乗せの槓が開槓されること', ()=>{
+            const game = init_game({shoupai:['_______,s222+,z111=','','','']});
+            game.zimo();
+            game.gang('z111=1');
+            game.gangzimo();
+            game.gang('s222+2');
+            assert.equal(game.model.shan.baopai.length, 2);
+        });
     });
 
     suite('gangzimo()', ()=>{
@@ -438,9 +469,10 @@ suite('Majiang.Game', ()=>{
         test('手牌にツモ牌が加えられること', ()=>
             assert.ok(game.model.shoupai[0].get_dapai()));
         test('第一ツモ巡でなくなること', ()=> assert.ok(! game._diyizimo));
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().gangzimo));
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu(-1).gangzimo));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param,
+                             { update: game.last_paipu(-1) }));
         test('通知が伝わること', (done)=>setTimeout(()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -451,6 +483,39 @@ suite('Majiang.Game', ()=>{
             }
             done();
         }, 0));
+
+        test('加槓の場合、即座には開槓されないこと', ()=>{
+            const game = init_game({shoupai:['__________,s333=','','','']});
+            game.zimo();
+            game.gang('s333=3');
+            game.gangzimo();
+            assert.equal(game.model.shan.baopai.length, 1);
+        });
+        test('カンドラ後乗せではない場合、加槓も即座に開槓されること', ()=>{
+            const game = init_game({rule:Majiang.rule({'カンドラ後乗せ':false}),
+                                    shoupai:['__________,s333=','','','']});
+            game.zimo();
+            game.gang('s333=3');
+            game.gangzimo();
+            assert.equal(game.model.shan.baopai.length, 2);
+        });
+        test('大明槓の場合、即座には開槓されないこと', ()=>{
+            const game = init_game({shoupai:['_','','_','']});
+            game.zimo();
+            game.dapai('s3');
+            game.fulou('s3333=');
+            game.gangzimo();
+            assert.equal(game.model.shan.baopai.length, 1);
+        });
+        test('カンドラ後乗せではない場合、大明槓も即座に開槓されること', ()=>{
+            const game = init_game({rule:Majiang.rule({'カンドラ後乗せ':false}),
+                                    shoupai:['_','','_','']});
+            game.zimo();
+            game.dapai('s3');
+            game.fulou('s3333=');
+            game.gangzimo();
+            assert.equal(game.model.shan.baopai.length, 2);
+        });
     });
 
     suite('kakigang()', ()=>{
@@ -476,6 +541,15 @@ suite('Majiang.Game', ()=>{
             }
             done();
         }, 0));
+
+        test('カンドラなしの場合、開槓しないこと', ()=>{
+            const rule = Majiang.rule({'カンドラあり':false});
+            const game = init_game({rule:rule,shoupai:['_','','','','']});
+            game.zimo();
+            game.gang('m1111');
+            game.gangzimo();
+            assert.equal(game.model.shan.baopai.length, 1);
+        });
     });
 
     suite('static get_dapai(rule, shoupai)', ()=>{
