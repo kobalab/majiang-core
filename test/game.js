@@ -373,6 +373,37 @@ suite('Majiang.Game', ()=>{
             game.dapai('z1');
             assert.ok(! game._fengpai);
         });
+        test('ダブルリーチ', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game.zimo();
+            game.dapai('m1*');
+            assert.equal(game._lizhi[game.model.lunban], 2);
+            assert.ok(game._yifa[game.model.lunban]);
+        });
+        test('リーチ', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game._diyizimo = false;
+            game.zimo();
+            game.dapai('m1_*');
+            assert.equal(game._lizhi[game.model.lunban], 1);
+            assert.ok(game._yifa[game.model.lunban]);
+        });
+        test('一発なし', ()=>{
+            const game = init_game({rule:Majiang.rule({'一発あり':false}),
+                                    shoupai:['_','','','']});
+            game._diyizimo = false;
+            game.zimo();
+            game.dapai('m1*');
+            assert.equal(game._lizhi[game.model.lunban], 1);
+            assert.ok(! game._yifa[game.model.lunban]);
+        });
+        test('リーチ後の打牌で一発の権利を失うこと', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game._yifa[0] = true;
+            game.zimo();
+            game.dapai('m1');
+            assert.ok(! game._yifa[game.model.lunban]);
+        });
         test('加槓後の打牌で開槓されること', ()=>{
             const game = init_game({shoupai:['__________,s333=','','','']});
             game.zimo();
@@ -389,15 +420,14 @@ suite('Majiang.Game', ()=>{
 
         test('河から副露牌が拾われること', ()=>{
             game.zimo();
-            game.dapai('m2*');
+            game.dapai('m2_');
             game.fulou('m12-3');
-            assert.equal(game.model.he[0]._pai[0], 'm2*-');
+            assert.equal(game.model.he[0]._pai[0], 'm2_-');
         });
         test('手番が更新されること(上家からのチー)', ()=>
             assert.equal(game.model.lunban, 1));
         test('手牌が副露されること', ()=>
             assert.equal(game.model.shoupai[1]._fulou[0], 'm12-3'));
-        test('第一ツモ巡でなくなること', ()=> assert.ok(! game._diyizimo));
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().fulou));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
@@ -416,6 +446,20 @@ suite('Majiang.Game', ()=>{
             game.dapai('m2');
             game.fulou('m2222+');
             assert.equal(game.model.shoupai[3]._fulou[0], 'm2222+');
+        });
+        test('第一ツモ巡でなくなること', ()=>{
+            const game = init_game({shoupai:['_','_','','_']});
+            game.zimo();
+            game.dapai('m3');
+            game.fulou('m123-');
+            assert.ok(! game._diyizimo)
+        });
+        test('一発がなくなること', ()=>{
+            const game = init_game({shoupai:['_','_','','_']});
+            game.zimo();
+            game.dapai('m3*');
+            game.fulou('m123-');
+            assert.ok(! game._yifa.find(x=>x));
         });
     });
 
@@ -468,7 +512,6 @@ suite('Majiang.Game', ()=>{
         });
         test('手牌にツモ牌が加えられること', ()=>
             assert.ok(game.model.shoupai[0].get_dapai()));
-        test('第一ツモ巡でなくなること', ()=> assert.ok(! game._diyizimo));
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu(-1).gangzimo));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param,
@@ -484,6 +527,22 @@ suite('Majiang.Game', ()=>{
             done();
         }, 0));
 
+        test('第一ツモ巡でなくなること', ()=>{
+            const game = init_game({shoupai:['_','','','_']});
+            game.zimo();
+            game.gang('m3333');
+            game.gangzimo();
+            assert.ok(! game._diyizimo)
+        });
+        test('一発がなくなること', ()=>{
+            const game = init_game({shoupai:['_','_','','_']});
+            game.zimo();
+            game.dapai('m3*');
+            game.zimo();
+            game.gang('m4444');
+            game.gangzimo();
+            assert.ok(! game._yifa.find(x=>x));
+        });
         test('加槓の場合、即座には開槓されないこと', ()=>{
             const game = init_game({shoupai:['__________,s333=','','','']});
             game.zimo();
