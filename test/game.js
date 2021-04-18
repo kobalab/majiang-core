@@ -404,6 +404,27 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1');
             assert.ok(! game._yifa[game.model.lunban]);
         });
+        test('テンパイ時に和了牌が河にある場合、フリテンとなること', ()=>{
+            const game = init_game({shoupai:['m123p456s789z11122','','','']});
+            game.model.lunban = 0;
+            game.dapai('m1');
+            assert.ok(! game._neng_rong[game.model.lunban]);
+        });
+        test('打牌によりフリテンが解除されること', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game._neng_rong[0] = false;
+            game.zimo();
+            game.dapai('m1');
+            assert.ok(game._neng_rong[game.model.lunban]);
+        });
+        test('リーチ後はフリテンが解除されないこと', ()=>{
+            const game = init_game({shoupai:['_____________*','','','']});
+            game._neng_rong[0] = false;
+            game.zimo();
+            let dapai = game.model.shoupai[0]._zimo;
+            game.dapai(dapai);
+            assert.ok(! game._neng_rong[game.model.lunban]);
+        });
         test('加槓後の打牌で開槓されること', ()=>{
             const game = init_game({shoupai:['__________,s333=','','','']});
             game.zimo();
