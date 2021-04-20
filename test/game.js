@@ -42,6 +42,18 @@ function init_game(param = {}) {
             game.model.shoupai[l] = Majiang.Shoupai.fromString(paistr);
         }
     }
+    if (param.zimo) {
+        let pai = game.model.shan._pai;
+        for (let i = 0; i < param.zimo.length; i++) {
+            pai[pai.length - 1 - i] = param.zimo[i];
+        }
+    }
+    if (param.gangzimo) {
+        let pai = game.model.shan._pai;
+        for (let i = 0; i < param.gangzimo.length; i++) {
+            pai[i] = param.gangzimo[i];
+        }
+    }
 
     return game;
 }
@@ -629,6 +641,167 @@ suite('Majiang.Game', ()=>{
             game.gang('m1111');
             game.gangzimo();
             assert.equal(game.model.shan.baopai.length, 1);
+        });
+    });
+
+    suite('hule()', ()=>{
+
+        const game = init_game({shoupai:['_','','m123p456s789z1122','']});
+
+        test('牌譜が記録されること', ()=>{
+            game.zimo();
+            game.dapai('z1');
+            game._hule = [2];
+            game.hule();
+            assert.ok(game.last_paipu().hule);
+        });
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].hule.l, 2);
+            }
+            done();
+        }, 0));
+
+        test('立直・一発', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','_','','']});
+            game._diyizimo = false;
+            game.zimo();
+            game.dapai(game.model.shoupai[0]._zimo + '_*');
+            game.zimo();
+            game.dapai('z1');
+            game._hule = [0];
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '立直'));
+            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '一発'));
+        });
+        test('ダブル立直', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','_','','']});
+            game.zimo();
+            game.dapai(game.model.shoupai[0]._zimo + '_*');
+            game.zimo();
+            game.dapai('z1');
+            game._hule = [0];
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai
+                                    .find(h=>h.name == 'ダブル立直'));
+        });
+        test('槍槓', ()=>{
+            const game = init_game({shoupai:['_________m1,m111=','_',
+                                             'm23p456s789z11222','']});
+            game.zimo();
+            game.gang('m111=1');
+            game._hule = [2];
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '槍槓'));
+        });
+        test('嶺上開花', ()=>{
+            const game = init_game({shoupai:['m123p456s78z11,m111=','','',''],
+                                    zimo:['m4'],gangzimo:['s9']});
+            game.zimo();
+            game.gang('m111=1');
+            game.gangzimo();
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai
+                                    .find(h=>h.name == '嶺上開花'));
+        });
+        test('最終牌で嶺上開花', ()=>{
+            const game = init_game({shoupai:['m123p456s78z11,m111=','','',''],
+                                    zimo:['m4'],gangzimo:['s9']});
+            game._diyizimo = false;
+            game.zimo();
+            game.gang('m111=1');
+            while (game.model.shan.paishu > 1) game.model.shan.zimo();
+            game.gangzimo();
+            game.hule();
+            assert.ok(! game.last_paipu().hule.hupai
+                                    .find(h=>h.name == '海底摸月'));
+        });
+        test('海底摸月', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z2']});
+            game._diyizimo = false;
+            game.zimo();
+            while (game.model.shan.paishu > 0) game.model.shan.zimo();
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai
+                                    .find(h=>h.name == '海底摸月'));
+        });
+        test('河底撈魚', ()=>{
+            const game = init_game({shoupai:['_','','m123p456s789z1122','']});
+            game._diyizimo = false;
+            game.zimo();
+            while (game.model.shan.paishu > 0) game.model.shan.zimo();
+            game.dapai('z2');
+            game._hule = [2];
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai
+                                    .find(h=>h.name == '河底撈魚'));
+        });
+        test('天和', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z2']});
+            game.zimo();
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '天和'));
+        });
+        test('地和', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z1122','',''],
+                                    zimo:['m1','z2']});
+            game.zimo();
+            game.dapai('m1_');
+            game.zimo();
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '地和'));
+        });
+        test('槍槓でダブロン', ()=>{
+            const game = init_game({shoupai:['__________,m111=',
+                                             'm23p456s789z11122',
+                                             'm23p789s456z33344','']});
+            game.zimo();
+            game.gang('m111=1');
+            game._hule = [ 1, 2 ];
+            game.hule();
+            game.hule();
+            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '槍槓'));
+        });
+        test('子の和了は輪荘', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z1122','','']});
+            game.zimo();
+            game.dapai('z1');
+            game._hule = [ 1 ];
+            game.hule();
+            assert.ok(! game._lianzhuang);
+        });
+        test('親の和了は連荘', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z1']});
+            game.zimo();
+            game.hule();
+            assert.ok(game._lianzhuang);
+        });
+        test('ダブロンは親の和了があれば連荘', ()=>{
+            const game = init_game({shoupai:['m23p456s789z11122','_',
+                                             'm23p789s546z33344',''],
+                                    zimo:['m2','m1']});
+            game.zimo();
+            game.dapai('m2');
+            game.zimo();
+            game.dapai('m1');
+            game._hule = [ 2, 0 ];
+            game.hule();
+            game.hule();
+            assert.ok(game._lianzhuang);
+        });
+        test('連荘なしの場合は親の和了があっても輪荘', ()=>{
+            const game = init_game({rule:Majiang.rule({'連荘方式':3}),
+                                    shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z1']});
+            game.zimo();
+            game.hule();
+            assert.ok(! game._lianzhuang);
         });
     });
 
