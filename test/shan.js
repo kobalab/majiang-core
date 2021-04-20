@@ -135,12 +135,13 @@ suite('Majiang.Shan', ()=>{
             }
             assert.throws(()=>shan.gangzimo());
         });
-        test('カンドラなしの場合は5つ目の槓ツモができること', ()=>{
+        test('カンドラなしでも5つ目の槓ツモができないこと', ()=>{
             let shan = Shan({'カンドラあり':false});
             for (let i = 0; i < 4; i++) {
                 shan.gangzimo();
             }
-            assert.ok(shan.gangzimo());
+            assert.equal(shan.baopai.length, 1);
+            assert.throws(()=>shan.gangzimo());
         });
     });
 
