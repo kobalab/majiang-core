@@ -805,6 +805,169 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('pingju(name, shoupai)', ()=>{
+
+        const game = init_game();
+
+        test('途中流局', ()=>{
+            game.pingju('九種九牌')
+            assert.ok(game._no_game);
+            assert.ok(game._lianzhuang);
+        });
+        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().pingju));
+        test('表示処理が呼び出されること', ()=>
+            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+        test('通知が伝わること', (done)=>setTimeout(()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.equal(MSG[id].pingju.name, '九種九牌');
+            }
+            done();
+        }, 0));
+
+        test('全員テンパイ', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
+                                    shoupai:['m22p12366s406789',
+                                             'm55p40s123,z111-,p678-',
+                                             'm67p678s22,s56-7,p444-',
+                                             'm12345p33s333,m406-']});
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(game.last_paipu().pingju.shoupai
+                                            .filter(s=>s).length, 4)
+            assert.deepEqual(game._fenpei, [0,0,0,0]);
+        });
+        test('全員ノーテン', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
+                                    shoupai:['m40789p4667s8z577',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm2233467p234555']});
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(game.last_paipu().pingju.shoupai
+                                            .filter(s=>s).length, 0)
+            assert.deepEqual(game._fenpei, [0,0,0,0]);
+        });
+        test('2人テンパイ', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
+                                    shoupai:['m22p12366s406789',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm12345p33s333,m406-']});
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(game.last_paipu().pingju.shoupai
+                                            .filter(s=>s).length, 2)
+            assert.deepEqual(game._fenpei, [1500,-1500,-1500,1500]);
+        });
+        test('形式テンパイとならない牌姿', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
+                                    shoupai:['m123p456s789z1111',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm12345p33s333,m406-']});
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(game.last_paipu().pingju.shoupai
+                                            .filter(s=>s).length, 1)
+            assert.deepEqual(game._fenpei, [-1000,-1000,-1000,3000]);
+        });
+        test('ノーテン宣言ありの場合、宣言なしをノーテンとみなすこと', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       'ノーテン宣言あり':true}),
+                                    shoupai:['m22p12366s406789',
+                                             'm55p40s123,z111-,p678-',
+                                             'm67p678s22,s56-7,p444-',
+                                             'm12345p33s333,m406-']});
+            game.pingju('',['','_','_','_']);
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(game.last_paipu().pingju.shoupai
+                                            .filter(s=>s).length, 3)
+            assert.deepEqual(game._fenpei, [-3000,1000,1000,1000]);
+        });
+        test('ノーテン罰なし', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       'ノーテン罰あり':false}),
+                                    shoupai:['m22p12366s406789',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm12345p33s333,m406-']});
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(game.last_paipu().pingju.shoupai
+                                            .filter(s=>s).length, 2)
+            assert.deepEqual(game._fenpei, [0,0,0,0]);
+        });
+        test('テンパイ連荘', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
+                                    shoupai:['m22p12366s406789',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm2233467p234555']});
+            game.pingju();
+            assert.ok(game._lianzhuang);
+        });
+        test('ノーテン親流れ', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
+                                    shoupai:['m40789p4667s8z577',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm2233467p234555']});
+            game.pingju();
+            assert.ok(! game._lianzhuang);
+        });
+        test('和了連荘の場合、親のテンパイでも輪荘すること', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       '連荘方式':3}),
+                                    shoupai:['m22p12366s406789',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm2233467p234555']});
+            game.pingju();
+            assert.ok(! game._lianzhuang);
+        });
+        test('ノーテン連荘の場合、親がノーテンでも連荘すること', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       '連荘方式':0}),
+                                    shoupai:['m40789p4667s8z577',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm2233467p234555']});
+            game.pingju();
+            assert.ok(game._lianzhuang);
+        });
+        test('流し満貫', ()=>{
+            const game = init_game({shoupai:['_','_','_','_']});
+            game.zimo(); game.dapai('z1');
+            game.zimo(); game.dapai('m2');
+            game.zimo(); game.dapai('p2');
+            game.zimo(); game.dapai('s2');
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '流し満貫');
+            assert.deepEqual(game._fenpei, [12000,-4000,-4000,-4000]);
+        });
+        test('鳴かれた場合、流し満貫は成立しない', ()=>{
+            const game = init_game({shoupai:['_','_','_','_']});
+            game.zimo(); game.dapai('z1');
+            game.fulou('z111-'); game.dapai('m2');
+            game.zimo(); game.dapai('p2');
+            game.zimo(); game.dapai('s2');
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+        });
+        test('2人が流し満貫', ()=>{
+            const game = init_game({shoupai:['_','_','_','_']});
+            game.zimo(); game.dapai('z1');
+            game.zimo(); game.dapai('m1');
+            game.zimo(); game.dapai('p2');
+            game.zimo(); game.dapai('s2');
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '流し満貫');
+            assert.deepEqual(game._fenpei, [8000,4000,-6000,-6000]);
+        });
+    });
+
     suite('static get_dapai(rule, shoupai)', ()=>{
 
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
