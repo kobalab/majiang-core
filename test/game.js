@@ -18,9 +18,10 @@ class Player {
 }
 
 class View {
-    kaiju(param)  { this._param = { kaiju:  param } }
-    redraw(param) { this._param = { redraw: param } }
-    update(param) { this._param = { update: param } }
+    kaiju  (param) { this._param = { kaiju:   param } }
+    redraw (param) { this._param = { redraw:  param } }
+    update (param) { this._param = { update:  param } }
+    summary(param) { this._param = { summary: param } }
 }
 
 function init_game(param = {}) {
@@ -52,6 +53,12 @@ function init_game(param = {}) {
         let pai = game.model.shan._pai;
         for (let i = 0; i < param.gangzimo.length; i++) {
             pai[i] = param.gangzimo[i];
+        }
+    }
+    if (param.defen) {
+        for (let l = 0; l < 4; l++) {
+            let id = game.model.player_id[l];
+            game.model.defen[id] = param.defen[l];
         }
     }
 
@@ -966,6 +973,186 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.last_paipu().pingju.name, '流し満貫');
             assert.deepEqual(game._fenpei, [8000,4000,-6000,-6000]);
         });
+    });
+
+    suite('last()', ()=>{
+        test('連荘時に局が進まないこと', ()=>{
+            const game = init_game();
+            game._lianzhuang = true;
+            game.last();
+            assert.equal(game.model.zhuangfeng, 0);
+            assert.equal(game.model.jushu, 0);
+        });
+        test('輪荘時に局が進むこと', ()=>{
+            const game = init_game();
+            game.model.zhuangfeng = 0;
+            game.model.jushu = 3;
+            game.last();
+            assert.equal(game.model.zhuangfeng, 1);
+            assert.equal(game.model.jushu, 0);
+        });
+        test('東風戦は東四局で終局すること', (done)=>{
+            const game = init_game({rule:Majiang.rule({'場数':1}),
+                                    defen:[10000,20000,30000,40000]});
+            game.model.zhuangfeng = 0;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('東南戦は南四局で終局すること', (done)=>{
+            const game = init_game({rule:Majiang.rule({'場数':2}),
+                                    defen:[10000,20000,30000,40000]});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('一荘戦は北四局で終局すること', (done)=>{
+            const game = init_game({rule:Majiang.rule({'場数':4}),
+                                    defen:[10000,20000,30000,40000]});
+            game.model.zhuangfeng = 3;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('連荘中でもトビ終了すること', (done)=>{
+            const game = init_game({defen:[50100,30000,20000,-100]});
+            game._lianzhuang = true;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('オーラス止め(東風戦)', (done)=>{
+            const game = init_game({rule:Majiang.rule({'場数':1}),
+                                    defen:[40000,30000,20000,10000]});
+            game.model.zhuangfeng = 0;
+            game.model.jushu = 3;
+            game._lianzhuang = true;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('オーラス止め(東南戦)', (done)=>{
+            const game = init_game({defen:[40000,30000,20000,10000]});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game._lianzhuang = true;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('途中流局ではオーラス止めしないこと', (done)=>{
+            const game = init_game({defen:[40000,30000,20000,10000]});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game._lianzhuang = true;
+            game._no_game = true;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(! game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('オーラス止めなし', (done)=>{
+            const game = init_game({rule:Majiang.rule({'オーラス止めあり':false}),
+                                    defen:[40000,30000,20000,10000]});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game._lianzhuang = true;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(! game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('一荘戦では延長戦がないこと', (done)=>{
+            const game = init_game({rule:Majiang.rule({'場数':4})});
+            game.model.zhuangfeng = 3;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('延長戦なし', (done)=>{
+            const game = init_game({rule:Majiang.rule({'延長戦方式':0})});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('延長戦突入', (done)=>{
+            const game = init_game();
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(! game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('延長戦サドンデス', (done)=>{
+            const game = init_game({defen:[10000,20000,30000,40000]});
+            game.model.zhuangfeng = 2;
+            game.model.jushu = 0;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('連荘優先サドンデス', (done)=>{
+            const game = init_game({rule:Majiang.rule({'延長戦方式':2})});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game.last();
+            assert.equal(game._max_jushu, 8);
+            setTimeout(()=>{
+                assert.ok(! game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('4局固定延長戦オーラス止め', (done)=>{
+            const game = init_game({rule:Majiang.rule({'延長戦方式':3})});
+            game.model.zhuangfeng = 1;
+            game.model.jushu = 3;
+            game.last();
+            assert.equal(game._max_jushu, 11);
+            setTimeout(()=>{
+                assert.ok(! game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('延長戦は最大四局で終了すること', (done)=>{
+            const game = init_game();
+            game.model.zhuangfeng = 2;
+            game.model.jushu = 3;
+            game.last();
+            setTimeout(()=>{
+                assert.ok(game._view._param.summary);
+                done();
+            }, 0);
+        });
+        test('一局戦');
     });
 
     suite('static get_dapai(rule, shoupai)', ()=>{
