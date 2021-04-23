@@ -145,10 +145,11 @@ suite('Majiang.Game', ()=>{
         const game = new Majiang.Game();
 
         test('停止すること', (done)=>{
-            game.stop();
+            game.stop(done);
             assert.ok(game._stop);
             assert.ok(! game._timeout_id);
-            done();
+            game._reply = [1,1,1,1];
+            game.next();
         });
     });
 
@@ -158,7 +159,6 @@ suite('Majiang.Game', ()=>{
 
         test('再開すること', (done)=>{
             game.stop();
-            game._reply = [];
             game.start();
             assert.ok(! game._stop);
             assert.ok(game._timeout_id);
@@ -200,23 +200,21 @@ suite('Majiang.Game', ()=>{
         let msg  = ['a','b','c','d'];
 
         test('通知が伝わること', (done)=>{
+            game.stop(()=>{
+                assert.deepEqual(MSG, msg);
+                done();
+            });
             MSG = [];
-            game._callback = done;
             game.call_players(type, msg);
             assert.equal(MSG.length, 0);
-            setTimeout(()=>{
-                assert.deepEqual(MSG, msg, 10);
-            }, 0);
         });
         test('応答が返ること', (done)=>{
-            MSG = [];
-            game._callback = done;
+            game.stop(done);
             game.call_players(type, msg);
         });
         test('遅い player がいても応答を取得できること', (done)=>{
-            MSG = [];
+            game.stop(done);
             for (let player of players) { player._delay = 100 }
-            game._callback = done;
             game.call_players(type, msg, 0);
         });
     });
