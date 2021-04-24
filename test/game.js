@@ -12,8 +12,11 @@ class Player {
     }
     action(msg, callback) {
         MSG[this._id] = msg;
-        if (callback)
-            setTimeout(()=>callback(this._reply.shift()), this._delay);
+        if (callback) {
+            if (this._delay)
+                    setTimeout(()=>callback(this._reply.shift()), this._delay);
+            else    callback(this._reply.shift());
+        }
     }
 }
 
@@ -31,6 +34,8 @@ function init_game(param = {}) {
     const game = new Majiang.Game(players, null, rule);
 
     game.view = new View();
+    game._speed = 0;
+    game._sync = true;
     game.stop();
     game.kaiju();
     game.qipai();
@@ -144,8 +149,8 @@ suite('Majiang.Game', ()=>{
 
         const game = new Majiang.Game();
 
-        test('停止すること', (done)=>{
-            game.stop(done);
+        test('停止すること', ()=>{
+            game.stop();
             assert.ok(game._stop);
             assert.ok(! game._timeout_id);
             game._reply = [1,1,1,1];
@@ -226,6 +231,7 @@ suite('Majiang.Game', ()=>{
         const game = new Majiang.Game(players, rule);
         game.view = new View();
         game._speed = 0;
+        game._sync = true;
         game.stop();
 
         test('起家が設定されること', ()=>{
@@ -241,7 +247,7 @@ suite('Majiang.Game', ()=>{
         });
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { kaiju: null }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let id = 0; id < 4; id++) {
                 let msg = {
                     kaiju: {
@@ -253,9 +259,9 @@ suite('Majiang.Game', ()=>{
                 };
                 assert.deepEqual(MSG[id], msg);
             }
-            done();
-        }, 0));
+        });
         test('起家を乱数で設定できること', ()=>{
+            game.stop();
             game.kaiju();
             assert.ok(game._model.qijia == 0 ||
                       game._model.qijia == 1 ||
@@ -266,7 +272,14 @@ suite('Majiang.Game', ()=>{
 
     suite('qipai(shan)', ()=>{
 
-        const game = init_game();
+        const players = [0,1,2,3].map(id => new Player(id));
+        const rule = Majiang.rule();
+        const game = new Majiang.Game(players, rule);
+        game.view = new View();
+        game._speed = 0;
+        game._sync = true;
+        game.stop();
+        game.kaiju();
 
         test('牌山が生成されること', ()=>{
             game.qipai();
@@ -291,24 +304,23 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().qipai));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { redraw: null }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].qipai.defen[l], 25000);
                 assert.ok(MSG[id].qipai.shoupai[l]);
             }
-            done();
-        }, 0));
+        });
 
         test('使用する牌山を指定できること', ()=>{
+            const game = init_game();
             const shan = new Majiang.Shan(game._rule);
             const shoupai = new Majiang.Shoupai(shan._pai.slice(-13));
             game.qipai(shan);
             assert.equal(game.model.shoupai[0].toString(), shoupai.toString());
         });
         test('途中流局なしの場合、最初から四風連打中でないこと', ()=>{
-            const rule = Majiang.rule({'途中流局あり':false});
-            const game = init_game({rule:rule});
+            const game = init_game({rule:Majiang.rule({'途中流局あり':false})});
             game.qipai();
             assert.ok(! game._fengpai);
         });
@@ -329,7 +341,7 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().zimo));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].zimo.l, game.model.lunban);
@@ -337,9 +349,7 @@ suite('Majiang.Game', ()=>{
                         assert.ok(MSG[id].zimo.p);
                 else    assert.ok(! MSG[id].zimo.p);
             }
-            done();
-        }, 0));
-        test('ツモ牌がない場合、流局すること');
+        });
     });
 
     suite('dapai(dapai)', ()=>{
@@ -358,14 +368,13 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().dapai));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].dapai.l, game.model.lunban);
                 assert.equal(MSG[id].dapai.p, dapai);
             }
-            done();
-        }, 0));
+        });
 
         test('風牌以外の打牌で四風連打中でなくなること', ()=>{
             const game = init_game({shoupai:['_','','','']});
@@ -469,14 +478,13 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().fulou));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].fulou.l, game.model.lunban);
                 assert.equal(MSG[id].fulou.m, 'm12-3');
             }
-            done();
-        }, 0));
+        });
 
         test('大明槓が副露されること', ()=>{
             const game = init_game({shoupai:['_','','','_']});
@@ -513,14 +521,13 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().gang));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].gang.l, game.model.lunban);
                 assert.equal(MSG[id].gang.m, 's555+0');
             }
-            done();
-        }, 0));
+        });
 
         test('暗槓が副露されること', ()=>{
             const game = init_game({shoupai:['_','','','']});
@@ -554,7 +561,7 @@ suite('Majiang.Game', ()=>{
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param,
                              { update: game.last_paipu(-1) }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].gangzimo.l, game.model.lunban);
@@ -562,8 +569,7 @@ suite('Majiang.Game', ()=>{
                         assert.ok(MSG[id].gangzimo.p);
                 else    assert.ok(! MSG[id].gangzimo.p);
             }
-            done();
-        }, 0));
+        });
 
         test('第一ツモ巡でなくなること', ()=>{
             const game = init_game({shoupai:['_','','','_']});
@@ -630,14 +636,13 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().kaigang));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].kaigang.baopai,
                              game.model.shan.baopai.pop());
             }
-            done();
-        }, 0));
+        });
 
         test('カンドラなしの場合、開槓しないこと', ()=>{
             const rule = Majiang.rule({'カンドラあり':false});
@@ -662,13 +667,12 @@ suite('Majiang.Game', ()=>{
         });
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].hule.l, 2);
             }
-            done();
-        }, 0));
+        });
 
         test('立直・一発', ()=>{
             const game = init_game({shoupai:['m123p456s789z1122','_','','']});
@@ -822,13 +826,12 @@ suite('Majiang.Game', ()=>{
         test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().pingju));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { update: game.last_paipu() }));
-        test('通知が伝わること', (done)=>setTimeout(()=>{
+        test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].pingju.name, '九種九牌');
             }
-            done();
-        }, 0));
+        });
 
         test('全員テンパイ', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false}),
@@ -989,166 +992,122 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.model.zhuangfeng, 1);
             assert.equal(game.model.jushu, 0);
         });
-        test('東風戦は東四局で終局すること', (done)=>{
+        test('東風戦は東四局で終局すること', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':1}),
                                     defen:[10000,20000,30000,40000]});
             game.model.zhuangfeng = 0;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('東南戦は南四局で終局すること', (done)=>{
+        test('東南戦は南四局で終局すること', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':2}),
                                     defen:[10000,20000,30000,40000]});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('一荘戦は北四局で終局すること', (done)=>{
+        test('一荘戦は北四局で終局すること', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':4}),
                                     defen:[10000,20000,30000,40000]});
             game.model.zhuangfeng = 3;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('連荘中でもトビ終了すること', (done)=>{
+        test('連荘中でもトビ終了すること', ()=>{
             const game = init_game({defen:[50100,30000,20000,-100]});
             game._lianzhuang = true;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('オーラス止め(東風戦)', (done)=>{
+        test('オーラス止め(東風戦)', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':1}),
                                     defen:[40000,30000,20000,10000]});
             game.model.zhuangfeng = 0;
             game.model.jushu = 3;
             game._lianzhuang = true;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('オーラス止め(東南戦)', (done)=>{
+        test('オーラス止め(東南戦)', ()=>{
             const game = init_game({defen:[40000,30000,20000,10000]});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game._lianzhuang = true;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('途中流局ではオーラス止めしないこと', (done)=>{
+        test('途中流局ではオーラス止めしないこと', ()=>{
             const game = init_game({defen:[40000,30000,20000,10000]});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game._lianzhuang = true;
             game._no_game = true;
             game.last();
-            setTimeout(()=>{
-                assert.ok(! game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'qipai');
         });
-        test('オーラス止めなし', (done)=>{
+        test('オーラス止めなし', ()=>{
             const game = init_game({rule:Majiang.rule({'オーラス止めあり':false}),
                                     defen:[40000,30000,20000,10000]});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game._lianzhuang = true;
             game.last();
-            setTimeout(()=>{
-                assert.ok(! game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'qipai');
         });
-        test('一荘戦では延長戦がないこと', (done)=>{
+        test('一荘戦では延長戦がないこと', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':4})});
             game.model.zhuangfeng = 3;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('延長戦なし', (done)=>{
+        test('延長戦なし', ()=>{
             const game = init_game({rule:Majiang.rule({'延長戦方式':0})});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
-        test('延長戦突入', (done)=>{
+        test('延長戦突入', ()=>{
             const game = init_game();
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(! game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'qipai');
         });
-        test('延長戦サドンデス', (done)=>{
+        test('延長戦サドンデス', ()=>{
             const game = init_game({defen:[10000,20000,30000,40000]});
             game.model.zhuangfeng = 2;
             game.model.jushu = 0;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._max_jushu, 7);
+            assert.equal(game._status, 'jieju');
         });
-        test('連荘優先サドンデス', (done)=>{
+        test('連荘優先サドンデス', ()=>{
             const game = init_game({rule:Majiang.rule({'延長戦方式':2})});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game.last();
             assert.equal(game._max_jushu, 8);
-            setTimeout(()=>{
-                assert.ok(! game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'qipai');
         });
-        test('4局固定延長戦オーラス止め', (done)=>{
+        test('4局固定延長戦オーラス止め', ()=>{
             const game = init_game({rule:Majiang.rule({'延長戦方式':3})});
             game.model.zhuangfeng = 1;
             game.model.jushu = 3;
             game.last();
             assert.equal(game._max_jushu, 11);
-            setTimeout(()=>{
-                assert.ok(! game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'qipai');
         });
-        test('延長戦は最大四局で終了すること', (done)=>{
+        test('延長戦は最大四局で終了すること', ()=>{
             const game = init_game();
             game.model.zhuangfeng = 2;
             game.model.jushu = 3;
             game.last();
-            setTimeout(()=>{
-                assert.ok(game._view._param.summary);
-                done();
-            }, 0);
+            assert.equal(game._status, 'jieju');
         });
         test('一局戦');
     });
