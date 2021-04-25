@@ -812,6 +812,14 @@ suite('Majiang.Game', ()=>{
             game.hule();
             assert.ok(! game._lianzhuang);
         });
+        test('一局戦の場合は親の和了でも輪荘', ()=>{
+            const game = init_game({rule:Majiang.rule({'場数':0}),
+                                    shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z1']});
+            game.zimo();
+            game.hule();
+            assert.ok(! game._lianzhuang);
+        });
     });
 
     suite('pingju(name, shoupai)', ()=>{
@@ -938,6 +946,16 @@ suite('Majiang.Game', ()=>{
         test('ノーテン連荘の場合、親がノーテンでも連荘すること', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
                                                        '連荘方式':0}),
+                                    shoupai:['m40789p4667s8z577',
+                                             'm99p12306z277,m345-',
+                                             'm3p1234689z55,s7-89',
+                                             'm2233467p234555']});
+            game.pingju();
+            assert.ok(game._lianzhuang);
+        });
+        test('一局戦の場合、親がノーテンでも連荘すること', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       '場数':0}),
                                     shoupai:['m40789p4667s8z577',
                                              'm99p12306z277,m345-',
                                              'm3p1234689z55,s7-89',
@@ -1109,7 +1127,13 @@ suite('Majiang.Game', ()=>{
             game.last();
             assert.equal(game._status, 'jieju');
         });
-        test('一局戦');
+        test('一局戦には延長戦はない', ()=>{
+            const game = init_game({rule:Majiang.rule({'場数':0})});
+            game.model.zhuangfeng = 0;
+            game.model.jushu = 0;
+            game.last();
+            assert.equal(game._status, 'jieju');
+        });
     });
 
     suite('static get_dapai(rule, shoupai)', ()=>{
