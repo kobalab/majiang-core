@@ -37,7 +37,8 @@ function init_game(param = {}) {
     game._speed = 0;
     game._sync = true;
     game.stop();
-    game.kaiju();
+    if (param.qijia != null) game.kaiju(param.qijia);
+    else                     game.kaiju();
     game.qipai();
 
     if (param.shoupai) {
@@ -65,6 +66,9 @@ function init_game(param = {}) {
             let id = game.model.player_id[l];
             game.model.defen[id] = param.defen[l];
         }
+    }
+    if (param.lizhibang) {
+        game.model.lizhibang = param.lizhibang;
     }
 
     return game;
@@ -1133,6 +1137,57 @@ suite('Majiang.Game', ()=>{
             game.model.jushu = 0;
             game.last();
             assert.equal(game._status, 'jieju');
+        });
+    });
+
+    suite('jieju()', ()=>{
+
+        const game = init_game({qijia:1,defen:[10000,20000,30000,40000]});
+
+        test('牌譜が記録されること', ()=>{
+            game.jieju();
+            assert.deepEqual(game._paipu.defen, [40000,10000,20000,30000]);
+            assert.deepEqual(game._paipu.rank, [1,4,3,2]);
+            assert.deepEqual(game._paipu.point, ['50','-40','-20','10']);
+        });
+        test('表示処理が呼び出されること', ()=>
+            assert.ok(game._view._param.summary));
+        test('通知が伝わること', ()=>{
+            for (let l = 0; l < 4; l++) {
+                let id = game.model.player_id[l];
+                assert.ok(MSG[id].jieju);
+            }
+        });
+
+        test('同点の場合は起家に近い方を上位とする', ()=>{
+            const game = init_game({qijia:2});
+            game.jieju();
+            assert.deepEqual(game._paipu.rank, [3,4,1,2]);
+            assert.deepEqual(game._paipu.point, ['-15','-25','35','5']);
+        });
+        test('終局時に残った供託リーチ棒はトップの得点に加算', ()=>{
+            const game = init_game({qijia:3,defen:[9000,19000,29000,40000],
+                                    lizhibang:3});
+            game.jieju();
+            assert.deepEqual(game._paipu.defen, [19000,29000,43000,9000]);
+        });
+        test('1000点未満のポイントは四捨五入する', ()=>{
+            const game = init_game({qijia:0,defen:[20400,28500,20500,30600]});
+            game.jieju();
+            assert.deepEqual(game._paipu.point, ['-30','9','-19','40']);
+        });
+        test('1000点未満のポイントは四捨五入する(負のケース)', ()=>{
+            const game = init_game({qijia:0,defen:[-1500,83800,6000,11700]});
+            game.jieju();
+            assert.deepEqual(game._paipu.point, ['-51','93','-34','-8']);
+        });
+        test('順位点を変更', ()=>{
+            const game = init_game({rule:Majiang.rule(
+                                                {'順位点':[30,10,-10,-30]}),
+                                    qijia:2});
+            game.jieju();
+            assert.deepEqual(game._paipu.rank, [3,4,1,2]);
+            assert.deepEqual(game._paipu.point, ['-15','-35','45','5']);
         });
     });
 
