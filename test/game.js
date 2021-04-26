@@ -1191,6 +1191,130 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('get_dapai()', ()=>{
+        test('現在の手番の可能な打牌を返すこと', ()=>{
+            const game = init_game({shoupai:['m123,z111+,z222=,z333-','','',''],
+                                    zimo:['m1']});
+            game.zimo();
+            assert.deepEqual(game.get_dapai(), ['m1','m2','m3','m1_']);
+        });
+        test('現物喰い替えありに変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule({'喰い替え許可レベル':2}),
+                                    shoupai:['_','m1234p567,z111=,s789-',
+                                             '','']});
+            game.zimo();
+            game.dapai('m1');
+            game.fulou('m1-23');
+            assert.deepEqual(game.get_dapai(), ['m1','m4','p5','p6','p7']);
+        });
+    });
+
+    suite('get_chi_mianzi()', ()=>{
+        test('現在打たれた牌でチーできる面子を返すこと', ()=>{
+            const game = init_game({shoupai:['','_','m1234p456s789z111','']});
+            game.zimo();
+            game.dapai(game.get_dapai()[0]);
+            game.zimo();
+            game.dapai('m2');
+            assert.deepEqual(game.get_chi_mianzi(2), ['m12-3','m2-34']);
+        });
+        test('自身はチーできないこと', ()=>{
+            const game = init_game({shoupai:['m1234p456s789z111','','','']});
+            game.zimo();
+            game.dapai(game.get_dapai().pop());
+            assert.throws(()=> game.get_chi_mianzi(0));
+        });
+        test('対面はチーできないこと', ()=>{
+            const game = init_game({shoupai:['_','','m1234p456s789z111','']});
+            game.zimo();
+            game.dapai('m2');
+            assert.deepEqual(game.get_chi_mianzi(2), []);
+        });
+        test('ハイテイ牌はチーできないこと', ()=>{
+            const game = init_game({shoupai:['_','m1234p456s789z111','','']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            game.dapai('m2');
+            assert.deepEqual(game.get_chi_mianzi(1), []);
+        });
+        test('現物喰い替えありに変更できること', ()=>{
+
+            const game = init_game({rule:Majiang.rule({'喰い替え許可レベル':2}),
+                                    shoupai:['_','m1123,p456-,z111=,s789-',
+                                             '','']});
+            game.zimo();
+            game.dapai('m1');
+            assert.deepEqual(game.get_chi_mianzi(1), ['m1-23']);
+        });
+    });
+
+    suite('get_peng_mianzi(l)', ()=>{
+        test('現在打たれた牌でポンできる面子を返すこと', ()=>{
+            const game = init_game({shoupai:['','_','','m1123p456s789z111']});
+            game.zimo();
+            game.dapai(game.get_dapai()[0]);
+            game.zimo();
+            game.dapai('m1');
+            assert.deepEqual(game.get_peng_mianzi(3), ['m111=']);
+        });
+        test('自身はポンできないこと', ()=>{
+            const game = init_game({shoupai:['m1123p456s789z111','','','']});
+            game.zimo();
+            game.dapai(game.get_dapai().pop());
+            assert.throws(()=> game.get_peng_mianzi(0));
+        });
+        test('ハイテイ牌はポンできないこと', ()=>{
+            const game = init_game({shoupai:['_','','m1123p456s789z111','']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            game.dapai('m1');
+            assert.deepEqual(game.get_peng_mianzi(2), []);
+        });
+    });
+
+    suite('get_gang_mianzi(l)', ()=>{
+        test('現在打たれた牌で大明槓できる面子を返すこと', ()=>{
+            const game = init_game({shoupai:['','_','','m1112p456s789z111']});
+            game.zimo();
+            game.dapai(game.get_dapai()[0]);
+            game.zimo();
+            game.dapai('m1');
+            assert.deepEqual(game.get_gang_mianzi(3), ['m1111=']);
+        });
+        test('自身は大明槓できないこと', ()=>{
+            const game = init_game({shoupai:['m1112p456s789z111','','','']});
+            game.zimo();
+            game.dapai(game.get_dapai().pop());
+            assert.throws(()=> game.get_gang_mianzi(0));
+        });
+        test('ハイテイ牌は大明槓できないこと', ()=>{
+            const game = init_game({shoupai:['_','','m1112p456s789z111','']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            game.dapai('m1');
+            assert.deepEqual(game.get_gang_mianzi(2), []);
+        });
+        test('現在の手番が暗槓もしくは加槓できる面子を返すこと', ()=>{
+            const game = init_game({shoupai:['m1111p456s78z1,z111=']});
+            game.zimo();
+            assert.deepEqual(game.get_gang_mianzi(), ['m1111','z111=1']);
+        });
+        test('ハイテイ牌は暗槓もしくは加槓できないこと', ()=>{
+            const game = init_game({shoupai:['m1111p456s78z1,z111=']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            assert.deepEqual(game.get_gang_mianzi(), []);
+        });
+        test('リーチ後の暗槓なしに変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule(
+                                                    {'リーチ後暗槓許可レベル':0}),
+                                    shoupai:['m111p456s789z1122*','','',''],
+                                    zimo:['m1']});
+            game.zimo();
+            assert.deepEqual(game.get_gang_mianzi(), []);
+        });
+    });
+
     suite('static get_dapai(rule, shoupai)', ()=>{
 
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
