@@ -1181,7 +1181,7 @@ suite('Majiang.Game', ()=>{
             game.jieju();
             assert.deepEqual(game._paipu.point, ['-51','93','-34','-8']);
         });
-        test('順位点を変更', ()=>{
+        test('順位点を変更できること', ()=>{
             const game = init_game({rule:Majiang.rule(
                                                 {'順位点':[30,10,-10,-30]}),
                                     qijia:2});
