@@ -1315,6 +1315,165 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('allow_lizhi(p)', ()=>{
+        test('指定された打牌でリーチ可能な場合、真を返す', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1123','','',''],
+                                    zimo:['z2']});
+            game.zimo();
+            assert.ok(game.allow_lizhi('z3*'));
+        });
+        test('ツモ番がない場合、リーチできない', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1123','','',''],
+                                    zimo:['z2']});
+            game.zimo();
+            while (game.model.shan.paishu >= 4) game.model.shan.zimo();
+            assert.ok(! game.allow_lizhi('z3*'));
+        });
+        test('持ち点が1000点に満たない場合、リーチできない', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1123','','',''],
+                                    zimo:['z2'],defen:[900,19100,45000,35000]});
+            game.zimo();
+            assert.ok(! game.allow_lizhi('z3*'));
+        });
+        test('ツモ番なしでもリーチできるように変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule(
+                                                {'ツモ番なしリーチあり':true}),
+                                    shoupai:['m123p456s789z1123','','',''],
+                                    zimo:['z2']});
+            game.zimo();
+            while (game.model.shan.paishu >= 4) game.model.shan.zimo();
+            assert.ok(game.allow_lizhi('z3*'));
+        });
+        test('持ち点が1000点に満たなくてもリーチできるように変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule({'トビ終了あり':false}),
+                                    shoupai:['m123p456s789z1123','','',''],
+                                    zimo:['z2'],defen:[900,19100,45000,35000]});
+            game.zimo();
+            assert.ok(game.allow_lizhi('z3*'));
+        });
+    });
+
+    suite('allow_hule(l)', ()=>{
+        test('ツモ和了', ()=>{
+            const game = init_game({shoupai:['m123p456s789z3344','','',''],
+                                    zimo:['z4']});
+            game.zimo();
+            assert.ok(game.allow_hule());
+        });
+        test('リーチ・ツモ', ()=>{
+            const game = init_game({shoupai:['m123p456s789z4*,z333=','','',''],
+                                    zimo:['z4']});
+            game.zimo();
+            assert.ok(game.allow_hule());
+        });
+        test('嶺上開花', ()=>{
+            const game = init_game({shoupai:['_','','m123p456s789z3334',''],
+                                    gangzimo:['z4']});
+            game.zimo();
+            game.dapai('z3');
+            game.fulou('z3333=');
+            game.gangzimo();
+            assert.ok(game.allow_hule());
+        });
+        test('ハイテイ・ツモ', ()=>{
+            const game = init_game({shoupai:['m123p456s789z4,z333=','','',''],
+                                    zimo:['z4']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            assert.ok(game.allow_hule());
+        });
+        test('場風のみ・ツモ', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z4,z111=','',''],
+                                    zimo:['m1','z4']});
+            game.zimo();
+            game.dapai('m1');
+            game.zimo();
+            assert.ok(game.allow_hule());
+        });
+        test('自風のみ・ツモ', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z4,z222=','',''],
+                                    zimo:['m1','z4']});
+            game.zimo();
+            game.dapai('m1');
+            game.zimo();
+            assert.ok(game.allow_hule());
+        });
+        test('リーチ・ロン', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z3334*','','']});
+            game.zimo();
+            game.dapai('z4');
+            assert.ok(game.allow_hule(1));
+        });
+        test('槍槓', ()=>{
+            const game = init_game({shoupai:['m1234p567s789,m111=','',
+                                             'm23p123567s12377','']});
+            game.zimo();
+            game.gang('m111=1');
+            assert.ok(game.allow_hule(2));
+        });
+        test('ハイテイ・ロン', ()=>{
+            const game = init_game({shoupai:['_','',
+                                             '','m123p456s789z4,z333=']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            game.dapai('z4');
+            assert.ok(game.allow_hule(3));
+        });
+        test('場風のみ・ロン', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z4,z111=',
+                                             '','']});
+            game.zimo();
+            game.dapai('z4');
+            assert.ok(game.allow_hule(1));
+        });
+        test('自風のみ・ロン', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z4,z222=',
+                                             '','']});
+            game.zimo();
+            game.dapai('z4');
+            assert.ok(game.allow_hule(1));
+        });
+        test('フリテンはロン和了できないこと', ()=>{
+            const game = init_game({shoupai:['m123p456s789z3344','','',''],
+                                    zimo:['z4','z3']});
+            game.zimo();
+            game.dapai('z4');
+            game.zimo();
+            game.dapai('z3');
+            assert.ok(! game.allow_hule(0));
+        });
+        test('クイタンなしにできること', ()=>{
+            const game = init_game({rule:Majiang.rule({'クイタンあり':false}),
+                                    shoupai:['_','m234p567s2244,m888-','','']});
+            game.zimo();
+            game.dapai('s4');
+            assert.ok(! game.allow_hule(1));
+        });
+    });
+
+    suite('allow_pingju()', ()=>{
+        test('九種九牌', ()=>{
+            const game = init_game({shoupai:['m123459z1234567','','','']});
+            game.zimo();
+            assert.ok(game.allow_pingju());
+        });
+        test('第一ツモ以降は九種九牌にならない', ()=>{
+            const game = init_game({shoupai:['_','_','m123459z1234567','']});
+            game.zimo();
+            game.dapai('s2');
+            game.fulou('s2-34');
+            game.dapai('z3');
+            game.zimo();
+            assert.ok(! game.allow_pingju());
+        });
+        test('途中流局なしの場合は九種九牌にできない', ()=>{
+            const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
+                                    shoupai:['m123459z1234567','','','']});
+            game.zimo();
+            assert.ok(! game.allow_pingju());
+        });
+    });
+
     suite('static get_dapai(rule, shoupai)', ()=>{
 
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
