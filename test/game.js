@@ -1200,6 +1200,15 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('reply_qipai()', ()=>{
+        test('ツモに遷移すること', ()=>{
+            const game = init_game();
+            game.qipai();
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+    });
+
     suite('get_dapai()', ()=>{
         test('現在の手番の可能な打牌を返すこと', ()=>{
             const game = init_game({shoupai:['m123,z111+,z222=,z333-','','',''],
