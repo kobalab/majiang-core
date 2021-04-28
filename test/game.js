@@ -34,9 +34,7 @@ function init_game(param = {}) {
     const game = new Majiang.Game(players, null, rule);
 
     game.view = new View();
-    game._speed = 0;
     game._sync = true;
-    game.stop();
     if (param.qijia != null) game.kaiju(param.qijia);
     else                     game.kaiju();
     game.qipai();
@@ -153,8 +151,8 @@ suite('Majiang.Game', ()=>{
 
         const game = new Majiang.Game();
 
-        test('停止すること', ()=>{
-            game.stop();
+        test('停止すること', (done)=>{
+            game.stop(done);
             assert.ok(game._stop);
             assert.ok(! game._timeout_id);
             game._reply = [1,1,1,1];
@@ -280,9 +278,7 @@ suite('Majiang.Game', ()=>{
         const rule = Majiang.rule();
         const game = new Majiang.Game(players, rule);
         game.view = new View();
-        game._speed = 0;
         game._sync = true;
-        game.stop();
         game.kaiju();
 
         test('牌山が生成されること', ()=>{
@@ -1188,6 +1184,19 @@ suite('Majiang.Game', ()=>{
             game.jieju();
             assert.deepEqual(game._paipu.rank, [3,4,1,2]);
             assert.deepEqual(game._paipu.point, ['-15','-35','45','5']);
+        });
+    });
+
+    suite('reply_kaiju()', ()=>{
+        test('配牌に遷移すること', ()=>{
+            const players = [0,1,2,3].map(id => new Player(id));
+            const rule = Majiang.rule();
+            const game = new Majiang.Game(players, rule);
+            game.view = new View();
+            game._sync = true;
+            game.kaiju();
+            game.next();
+            assert.ok(game.last_paipu().qipai);
         });
     });
 
