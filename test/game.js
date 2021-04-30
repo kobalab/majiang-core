@@ -1311,6 +1311,275 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('reply_dapai()', ()=>{
+        test('応答なし', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game.zimo();
+            game.dapai('m1');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('ロン和了', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z1122','','']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{},{}]);
+            game.dapai('z1');
+            game.next();
+            assert.deepEqual(game._view._say, ['rong', 1]);
+            assert.equal(game.last_paipu().hule.l, 1);
+        });
+        test('和了見逃しでフリテンになること', ()=>{
+            const game = init_game({shoupai:['_','m123p456s789z1122','','']});
+            game.zimo();
+            game.dapai('z1');
+            game.next();
+            assert.ok(! game._neng_rong[1]);
+        });
+        test('ダブロン', ()=>{
+            const game = init_game({shoupai:['_','m23446p45688s345',
+                                             'm34s33,s444-,s666+,p406-','']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
+            game.dapai('m5*');
+            game.next();
+            assert.equal(game.last_paipu().hule.l, 1);
+            assert.deepEqual(game._hule, [2]);
+        });
+        test('ダブロン頭ハネに変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule({'最大同時和了数':1}),
+                                    shoupai:['_','m23446p45688s345',
+                                             'm34s33,s444-,s666+,p406-','']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
+            game.dapai('m5*');
+            game.next();
+            assert.equal(game.last_paipu().hule.l, 1);
+            assert.deepEqual(game._hule, []);
+        });
+        test('三家和', ()=>{
+            const game = init_game({shoupai:['_','m23446p45688s345',
+                                             'm34s33,s444-,s666+,p406-',
+                                             'm23467s88,s222+,z666=']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{hule:'-'},{hule:'-'}]);
+            game.dapai('m5*');
+            game.next();
+            assert.equal(game.last_paipu().pingju.name, '三家和');
+            assert.deepEqual(game.last_paipu().pingju.shoupai,
+                             ['','m23446p45688s345',
+                              'm34s33,s444-,s666+,p406-',
+                              'm23467s88,s222+,z666=']);
+        });
+        test('トリロン可に変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule({'最大同時和了数':3}),
+                                    shoupai:['_','m23446p45688s345',
+                                             'm34s33,s444-,s666+,p406-',
+                                             'm23467s88,s222+,z666=']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{hule:'-'},{hule:'-'}]);
+            game.dapai('m5*');
+            game.next();
+            assert.equal(game.last_paipu().hule.l, 1);
+            assert.deepEqual(game._hule, [2, 3]);
+        });
+        test('リーチ成立', ()=>{
+            const game = init_game({shoupai:['m55688p234567s06','','',''],
+                                    qijia:0,zimo:['s7']});
+            game.zimo();
+            game.dapai('m5*');
+            game.next();
+            assert.equal(game.model.defen[0], 24000);
+            assert.equal(game.model.lizhibang, 1);
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('リーチ不成立', ()=>{
+            const game = init_game({shoupai:['m55688p234567s06',
+                                             'm23446p45688s345','',''],
+                                    qijia:0,zimo:['s7']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{},{}]);
+            game.dapai('m5*');
+            game.next();
+            assert.equal(game.model.defen[0], 25000);
+            assert.equal(game.model.lizhibang, 0);
+            assert.ok(game.last_paipu().hule);
+        });
+        test('四家立直', ()=>{
+            const game = init_game({shoupai:['m11156p5688s2346',
+                                             'm2227p11340s2356',
+                                             'm2346789p345699',
+                                             'm34056p4678s3456'],
+                                    qijia:0,zimo:['p4','s1','m7','s6']});
+            for (let p of ['s6*','m7*','p6*','p4*']) {
+                game.zimo();
+                game.dapai(p);
+            }
+            game.next();
+            assert.equal(game.last_paipu().pingju.name, '四家立直');
+            assert.deepEqual(game.last_paipu().pingju.shoupai,
+                             ['m11156p45688s234*',
+                              'm222p11340s12356*',
+                              'm23467789p34599*',
+                              'm34056p678s34566*']);
+        });
+        test('途中流局なしの場合は四家立直でも続行すること', ()=>{
+            const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
+                                    shoupai:['m11156p5688s2346',
+                                             'm2227p11340s2356',
+                                             'm2346789p345699',
+                                             'm34056p4678s3456'],
+                                    qijia:0,zimo:['p4','s1','m7','s6']});
+            for (let p of ['s6*','m7*','p6*','p4*']) {
+                game.zimo();
+                game.dapai(p);
+            }
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('四風連打', ()=>{
+            const game = init_game({shoupai:['_','_','_','_']});
+            for (let l = 0; l < 4; l++) {
+                game.zimo();
+                game.dapai('z1');
+            }
+            game.next();
+            assert.equal(game.last_paipu().pingju.name, '四風連打');
+            assert.deepEqual(game.last_paipu().pingju.shoupai, ['','','','']);
+        });
+        test('途中流局なしの場合は四風連打とならず、第一ツモ巡が終了すること', ()=>{
+            const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
+                                    shoupai:['_','_','_','_']});
+            for (let l = 0; l < 4; l++) {
+                game.zimo();
+                game.dapai('z1');
+            }
+            game.next();
+            assert.ok(! game._diyizimo);
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('四開槓', ()=>{
+            const game = init_game({shoupai:['_','m111p22279s57,s333=',
+                                             'm123p456s222789z2',''],
+                                    zimo:['m1'],
+                                    gangzimo:['p2','s3','s2','z7']});
+            game.zimo();
+            game.dapai('m1_');
+            game.fulou('m1111-');
+            game.gangzimo();
+            game.gang('p2222');
+            game.gangzimo();
+            game.gang('s333=3');
+            game.gangzimo();
+            game.dapai('s2');
+            game.fulou('s2222-');
+            game.gangzimo();
+            game.dapai('z7_');
+            game.next();
+            assert.equal(game.last_paipu().pingju.name, '四開槓');
+            assert.deepEqual(game.last_paipu().pingju.shoupai, ['','','','']);
+        });
+        test('1人で四開槓', ()=>{
+            const game = init_game({shoupai:['m1112,p111+,s111=,z111-',
+                                             '','',''],
+                                    zimo:['m1'],
+                                    gangzimo:['p1','s1','z1','z7']});
+            game.zimo();
+            game.gang('m1111');
+            game.gangzimo();
+            game.gang('p111+1');
+            game.gangzimo();
+            game.gang('s111=1');
+            game.gangzimo();
+            game.gang('z111-1');
+            game.gangzimo();
+            game.dapai('z7');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('途中流局なしでは四開槓とならない', ()=>{
+            const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
+                                    shoupai:['_','m111p22279s57,s333=',
+                                             'm123p456s222789z2',''],
+                                    zimo:['m1'],
+                                    gangzimo:['p2','s3','s2','z7']});
+            game.zimo();
+            game.dapai('m1_');
+            game.fulou('m1111-');
+            game.gangzimo();
+            game.gang('p2222');
+            game.gangzimo();
+            game.gang('s333=3');
+            game.gangzimo();
+            game.dapai('s2');
+            game.fulou('s2222-');
+            game.gangzimo();
+            game.dapai('z7_');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('カン', ()=>{
+            const game = init_game({shoupai:['_','','','m111234p567s3378']});
+            game.zimo();
+            set_reply(game, [{},{},{},{fulou:'m1111+'}]);
+            game.dapai('m1');
+            game.next();
+            assert.deepEqual(game._view._say, ['gang', 3]);
+            assert.equal(game.last_paipu().fulou.m, 'm1111+');
+        });
+        test('カン(不正応答)', ()=>{
+            const game = init_game({shoupai:['_','','','m111234p567s3378']});
+            game.zimo();
+            set_reply(game, [{},{},{},{fulou:'m1111+'}]);
+            game.dapai('m2');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('ポン', ()=>{
+            const game = init_game({shoupai:['_','','m112345p567s3378','']});
+            game.zimo();
+            set_reply(game, [{},{},{fulou:'m111='},{}]);
+            game.dapai('m1');
+            game.next();
+            assert.deepEqual(game._view._say, ['peng', 2]);
+            assert.equal(game.last_paipu().fulou.m, 'm111=');
+        });
+        test('ポン(不正応答)', ()=>{
+            const game = init_game({shoupai:['_','','m112345p567s3378','']});
+            game.zimo();
+            set_reply(game, [{},{},{fulou:'m111='},{}]);
+            game.dapai('m2');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('チー', ()=>{
+            const game = init_game({shoupai:['_','m112345p567s3378','','']});
+            game.zimo();
+            set_reply(game, [{},{fulou:'m456-'},{},{}]);
+            game.dapai('m6');
+            game.next();
+            assert.deepEqual(game._view._say, ['chi', 1]);
+            assert.equal(game.last_paipu().fulou.m, 'm456-');
+        });
+        test('チー(不正応答)', ()=>{
+            const game = init_game({shoupai:['_','m112345p567s3378','','']});
+            game.zimo();
+            set_reply(game, [{},{fulou:'m456-'},{},{}]);
+            game.dapai('m5');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('ポンとチーの競合はポンを優先', ()=>{
+            const game = init_game({shoupai:['_','m23567p456s889z11',
+                                             'm11789p123s11289','']});
+            game.zimo();
+            set_reply(game, [{},{fulou:'m1-23'},{fulou:'m111='},{}]);
+            game.dapai('m1');
+            game.next();
+            assert.deepEqual(game._view._say, ['peng', 2]);
+            assert.equal(game.last_paipu().fulou.m, 'm111=');
+        })
+    });
+
     suite('get_dapai()', ()=>{
         test('現在の手番の可能な打牌を返すこと', ()=>{
             const game = init_game({shoupai:['m123,z111+,z222=,z333-','','',''],
@@ -1595,7 +1864,6 @@ suite('Majiang.Game', ()=>{
     });
 
     suite('static get_dapai(rule, shoupai)', ()=>{
-
         let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
                                      .fulou('m1-23');
         test('喰い替えなし', ()=>
