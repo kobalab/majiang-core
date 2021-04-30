@@ -902,6 +902,14 @@ suite('Majiang.Game', ()=>{
                                             .filter(s=>s).length, 3)
             assert.deepEqual(game._fenpei, [-3000,1000,1000,1000]);
         });
+        test('ノーテン宣言であってもリーチ者の手牌は公開すること', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       'ノーテン宣言あり':true}),
+                                    shoupai:['m22p12366s406789*','','','']});
+            game.pingju();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.ok(game.last_paipu().pingju.shoupai[0]);
+        });
         test('ノーテン罰なし', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
                                                        'ノーテン罰あり':false}),
