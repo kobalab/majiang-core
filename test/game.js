@@ -813,7 +813,7 @@ suite('Majiang.Game', ()=>{
             assert.ok(game._lianzhuang);
         });
         test('連荘なしの場合は親の和了があっても輪荘', ()=>{
-            const game = init_game({rule:Majiang.rule({'連荘方式':3}),
+            const game = init_game({rule:Majiang.rule({'連荘方式':0}),
                                     shoupai:['m123p456s789z1122','','',''],
                                     zimo:['z1']});
             game.zimo();
@@ -951,7 +951,7 @@ suite('Majiang.Game', ()=>{
         });
         test('和了連荘の場合、親のテンパイでも輪荘すること', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
-                                                       '連荘方式':3}),
+                                                       '連荘方式':1}),
                                     shoupai:['m22p12366s406789',
                                              'm99p12306z277,m345-',
                                              'm3p1234689z55,s7-89',
@@ -961,7 +961,7 @@ suite('Majiang.Game', ()=>{
         });
         test('ノーテン連荘の場合、親がノーテンでも連荘すること', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
-                                                       '連荘方式':0}),
+                                                       '連荘方式':3}),
                                     shoupai:['m40789p4667s8z577',
                                              'm99p12306z277,m345-',
                                              'm3p1234689z55,s7-89',
