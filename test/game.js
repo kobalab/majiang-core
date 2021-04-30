@@ -24,6 +24,7 @@ class View {
     kaiju  (param) { this._param = { kaiju:   param } }
     redraw (param) { this._param = { redraw:  param } }
     update (param) { this._param = { update:  param } }
+    say (...param) { this._say   = param              }
     summary(param) { this._param = { summary: param } }
 }
 
@@ -70,6 +71,13 @@ function init_game(param = {}) {
     }
 
     return game;
+}
+
+function set_reply(game, reply) {
+    for (let l = 0; l < 4; l++) {
+        let id = game.model.player_id[l];
+        game._players[id]._reply = [reply[l]];
+    }
 }
 
 suite('Majiang.Game', ()=>{
@@ -1217,6 +1225,92 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('reply_zimo()', ()=>{
+        test('打牌', ()=>{
+            const game = init_game({zimo:['m1']});
+            set_reply(game, [{dapai:'m1_'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.equal(game.last_paipu().dapai.p, 'm1_');
+        });
+        test('リーチ', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['m1']});
+            set_reply(game, [{dapai:'m1_*'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.equal(game.last_paipu().dapai.p, 'm1_*');
+        });
+        test('打牌(不正応答)', ()=>{
+            const game = init_game({zimo:['m1']});
+            set_reply(game, [{dapai:'m2_'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
+        test('九種九牌', ()=>{
+            const game = init_game({shoupai:['m123459z1234567','','','']});
+            set_reply(game, [{pingju:'-'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.equal(game.last_paipu().pingju.name, '九種九牌');
+        });
+        test('九種九牌(不正応答)', ()=>{
+            const game = init_game({shoupai:['m234567z1234567','','','']});
+            set_reply(game, [{pingju:'-'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
+        test('途中流局なしの場合は九種九牌にできないこと', ()=>{
+            const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
+                                    shoupai:['m123459z1234567','','','']});
+            set_reply(game, [{pingju:'-'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
+        test('ツモ和了', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z1']});
+            set_reply(game, [{hule:'-'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.deepEqual(game._view._say, ['zimo', 0]);
+            assert.ok(game.last_paipu().hule);
+        });
+        test('ツモ和了(不正応答)', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z3']});
+            set_reply(game, [{hule:'-'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
+        test('カン', ()=>{
+            const game = init_game({shoupai:['m123p456z1122,s888+','','',''],
+                                    zimo:['s8']});
+            set_reply(game, [{gang:'s888+8'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().gang.m, 's888+8');
+        });
+        test('カン(不正応答)', ()=>{
+            const game = init_game({shoupai:['m123p456z1122,s888+','','',''],
+                                    zimo:['s7']});
+            set_reply(game, [{gang:'s888+8'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
+        test('無応答のときにツモ切りすること', ()=>{
+            const game = init_game({zimo:['m1']});
+            game.zimo();
+            game.next();
+            assert.equal(game.last_paipu().dapai.p, 'm1_');
+        });
+    });
+
     suite('get_dapai()', ()=>{
         test('現在の手番の可能な打牌を返すこと', ()=>{
             const game = init_game({shoupai:['m123,z111+,z222=,z333-','','',''],
@@ -1680,6 +1774,10 @@ suite('Majiang.Game', ()=>{
         test('指定された打牌でリーチ可能な場合、真を返すこと', ()=>{
             let shoupai = Majiang.Shoupai.fromString('m123p456s789z11112');
             assert.ok(Majiang.Game.allow_lizhi(rule, shoupai, 'z1'));
+        });
+        test('指定された打牌でリーチできない場合、偽を返すこと', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z11112');
+            assert.ok(! Majiang.Game.allow_lizhi(rule, shoupai, 'z2'));
         });
         test('打牌が指定されていない場合、リーチ可能な打牌一覧を返す', ()=>{
             let shoupai = Majiang.Shoupai.fromString('m123p456s788z11122');
