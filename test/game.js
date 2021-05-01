@@ -1758,6 +1758,25 @@ suite('Majiang.Game', ()=>{
         })
     });
 
+    suite('reply_pingju()', ()=>{
+        test('流局', ()=>{
+            const game = init_game({shoupai:['m123p456s789z1122','_','_','_'],
+                                    qijia:0,changbang:1,lizhibang:1,
+                                    defen:[25000,25000,25000,24000],
+                                    zimo:['m2','m3','m4','m5']});
+            for (let p of ['m2','m3','m4','m5']) {
+                game.zimo();
+                game.dapai(p);
+            }
+            game.pingju();
+            game.next();
+            assert.deepEqual(game.model.defen, [28000,24000,24000,23000]);
+            assert.equal(game.model.changbang, 2);
+            assert.equal(game.model.lizhibang, 1);
+            assert.ok(game.last_paipu().qipai);
+        });
+    });
+
     suite('get_dapai()', ()=>{
         test('現在の手番の可能な打牌を返すこと', ()=>{
             const game = init_game({shoupai:['m123,z111+,z222=,z333-','','',''],
