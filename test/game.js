@@ -1525,6 +1525,21 @@ suite('Majiang.Game', ()=>{
             game.next();
             assert.ok(game.last_paipu().zimo);
         });
+        test('流局', ()=>{
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       'ノーテン宣言あり':true}),
+                                    shoupai:['_','m222p11340s12356',
+                                             'm23467789p34599','_']});
+            game.zimo();
+            while (game.model.shan.paishu) game.model.shan.zimo();
+            set_reply(game, [{},{shoupai:'-'},{shoupai:'-'},{}]);
+            game.dapai(game.model.shoupai[0].get_dapai()[0]);
+            game.next();
+            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.deepEqual(game.last_paipu().pingju.shoupai,
+                             ['','m222p11340s12356',
+                              'm23467789p34599','']);
+        });
         test('カン', ()=>{
             const game = init_game({shoupai:['_','','','m111234p567s3378']});
             game.zimo();
