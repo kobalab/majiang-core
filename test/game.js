@@ -38,6 +38,14 @@ function init_game(param = {}) {
     game._sync = true;
     if (param.qijia != null) game.kaiju(param.qijia);
     else                     game.kaiju();
+
+    if (param.lizhibang) {
+        game.model.lizhibang = param.lizhibang;
+    }
+    if (param.changbang) {
+        game.model.changbang = param.changbang;
+    }
+
     game.qipai();
 
     if (param.shoupai) {
@@ -60,14 +68,14 @@ function init_game(param = {}) {
             pai[i] = param.gangzimo[i];
         }
     }
+    if (param.baopai) {
+        game.model.shan._baopai = [ param.baopai ];
+    }
     if (param.defen) {
         for (let l = 0; l < 4; l++) {
             let id = game.model.player_id[l];
             game.model.defen[id] = param.defen[l];
         }
-    }
-    if (param.lizhibang) {
-        game.model.lizhibang = param.lizhibang;
     }
 
     return game;
@@ -1692,6 +1700,62 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.last_paipu().hule.l, 1);
             assert.deepEqual(game._hule, []);
         });
+    });
+
+    suite('reply_hule()', ()=>{
+        test('親のツモ和了', ()=>{
+            const game = init_game({shoupai:['m345567p111s3368','','',''],
+                                    qijia:0,changbang:1,lizhibang:1,
+                                    defen:[25000,25000,25000,24000],
+                                    baopai:'p2',zimo:['s7']});
+            game._diyizimo = false;
+            game.zimo();
+            game._hule = [0];
+            game.hule();
+            game.next();
+            assert.deepEqual(game.model.defen, [28400,24200,24200,23200]);
+            assert.equal(game.model.changbang, 2);
+            assert.equal(game.model.lizhibang, 0);
+            assert.ok(game.last_paipu().qipai)
+        });
+        test('子のロン和了', ()=>{
+            const game = init_game({shoupai:['_','m345567p111s66z11','',''],
+                                    qijia:0,changbang:1,lizhibang:1,
+                                    defen:[25000,25000,25000,24000],
+                                    baopai:'p2',zimo:['s7']});
+            game.zimo();
+            game.dapai('z1');
+            game._hule = [1];
+            game.hule();
+            game.next();
+            assert.deepEqual(game.model.defen, [23100,27900,25000,24000]);
+            assert.equal(game.model.changbang, 0);
+            assert.equal(game.model.lizhibang, 0);
+            assert.ok(game.last_paipu().qipai)
+        });
+        test('ダブロンで連荘', ()=>{
+            const game = init_game({shoupai:['m23p456s789z11122','_',
+                                             'm23p789s546z33344',''],
+                                    qijia:0,changbang:1,lizhibang:1,
+                                    defen:[25000,25000,25000,24000],
+                                    baopai:'s9',zimo:['m2','m1']});
+            game.zimo();
+            game.dapai('m2');
+            game.zimo();
+            game.dapai('m1');
+            game._hule = [ 2, 0 ];
+            game.hule();
+            game.next();
+            assert.deepEqual(game.model.defen, [25000,23400,27600,24000]);
+            assert.equal(game.model.changbang, 0);
+            assert.equal(game.model.lizhibang, 0);
+            assert.ok(game.last_paipu().hule);
+            game.next();
+            assert.deepEqual(game.model.defen, [28900,19500,27600,24000]);
+            assert.equal(game.model.changbang, 2);
+            assert.equal(game.model.lizhibang, 0);
+            assert.ok(game.last_paipu().qipai);
+        })
     });
 
     suite('get_dapai()', ()=>{
