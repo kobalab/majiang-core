@@ -1345,7 +1345,7 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.last_paipu().hule.l, 1);
             assert.deepEqual(game._hule, [2]);
         });
-        test('ダブロン頭ハネに変更できること', ()=>{
+        test('ダブロンを頭ハネに変更できること', ()=>{
             const game = init_game({rule:Majiang.rule({'最大同時和了数':1}),
                                     shoupai:['_','m23446p45688s345',
                                              'm34s33,s444-,s666+,p406-','']});
@@ -1614,6 +1614,83 @@ suite('Majiang.Game', ()=>{
             game.fulou('m1-23');
             game.next();
             assert.equal(game.last_paipu().dapai.p, 'z1');
+        });
+    });
+
+    suite('reply_gang()', ()=>{
+        test('応答なし', ()=>{
+            const game = init_game({shoupai:['m45p456s11789,m111+','','',''],
+                                    zimo:['m1']});
+            game.zimo();
+            game.gang('m111+1');
+            game.next();
+            assert.ok(game.last_paipu().gangzimo);
+        });
+        test('ロン和了(槍槓)', ()=>{
+            const game = init_game({shoupai:['m45p456s11789,m111+','',
+                                             '','m23456p123s67899'],
+                                    zimo:['m1']});
+            game.zimo();
+            set_reply(game, [{},{},{},{hule:'-'}]);
+            game.gang('m111+1');
+            game.next();
+            assert.deepEqual(game._view._say, ['rong', 3]);
+            assert.equal(game.last_paipu().hule.l, 3);
+        });
+        test('ロン和了(不正応答)', ()=>{
+            const game = init_game({shoupai:['m45p456s11789,m111+','',
+                                             '','m33456p123s67899'],
+                                    zimo:['m1']});
+            game.zimo();
+            set_reply(game, [{},{},{},{hule:'-'}]);
+            game.gang('m111+1');
+            game.next();
+            assert.ok(game.last_paipu().gangzimo);
+        });
+        test('暗槓は槍槓できない', ()=>{
+            const game = init_game({shoupai:['m11145p456s11789','',
+                                             '','m23456p123s67899'],
+                                    zimo:['m1']});
+            game.zimo();
+            set_reply(game, [{},{},{},{hule:'-'}]);
+            game.gang('m1111');
+            game.next();
+            assert.ok(game.last_paipu(-1).gangzimo);
+            assert.ok(game.last_paipu().kaigang);
+        });
+        test('和了見逃しでフリテンになること', ()=>{
+            const game = init_game({shoupai:['m45p456s11789,m111+','',
+                                             '','m23456p123s67899'],
+                                    zimo:['m1']});
+            game.zimo();
+            game.gang('m111+1');
+            game.next();
+            assert.ok(! game._neng_rong[3]);
+        });
+        test('ダブロン', ()=>{
+            const game = init_game({shoupai:['m11p222s88,z666=,m505-',
+                                             'm23446p45688s345',
+                                             'm34s33,s444-,s666+,p406-',''],
+                                    zimo:['m5']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
+            game.gang('m505-5');
+            game.next();
+            assert.equal(game.last_paipu().hule.l, 1);
+            assert.deepEqual(game._hule, [2]);
+        });
+        test('ダブロンを頭ハネに変更できること', ()=>{
+            const game = init_game({rule:Majiang.rule({'最大同時和了数':1}),
+                                    shoupai:['m11p222s88,z666=,m505-',
+                                             'm23446p45688s345',
+                                             'm34s33,s444-,s666+,p406-',''],
+                                    zimo:['m5']});
+            game.zimo();
+            set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
+            game.gang('m505-5');
+            game.next();
+            assert.equal(game.last_paipu().hule.l, 1);
+            assert.deepEqual(game._hule, []);
         });
     });
 
