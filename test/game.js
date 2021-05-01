@@ -1580,6 +1580,43 @@ suite('Majiang.Game', ()=>{
         })
     });
 
+    suite('reply_fulou()', ()=>{
+        test('大明槓', ()=>{
+            const game = init_game({shoupai:['_','m1112356p456s889','','']});
+            game.zimo();
+            game.dapai('m1');
+            game.fulou('m1111-');
+            game.next();
+            assert.ok(game.last_paipu().gangzimo);
+        });
+        test('チー・ポン → 打牌', ()=>{
+            const game = init_game({shoupai:['_','m23567p456s889z11','','']});
+            game.zimo();
+            game.dapai('m1');
+            set_reply(game, [{},{dapai:'s9'},{},{}]);
+            game.fulou('m1-23');
+            game.next();
+            assert.equal(game.last_paipu().dapai.p, 's9');
+        });
+        test('チー・ポン → 打牌(不正応答)', ()=>{
+            const game = init_game({shoupai:['_','m23456p456s889z11','','']});
+            game.zimo();
+            game.dapai('m1');
+            set_reply(game, [{},{dapai:'m4'},{},{}]);
+            game.fulou('m1-23');
+            game.next();
+            assert.equal(game.last_paipu().dapai.p, 'z1');
+        });
+        test('無応答のときに右端の牌を切ること', ()=>{
+            const game = init_game({shoupai:['_','m23567p456s889z11','','']});
+            game.zimo();
+            game.dapai('m1');
+            game.fulou('m1-23');
+            game.next();
+            assert.equal(game.last_paipu().dapai.p, 'z1');
+        });
+    });
+
     suite('get_dapai()', ()=>{
         test('現在の手番の可能な打牌を返すこと', ()=>{
             const game = init_game({shoupai:['m123,z111+,z222=,z333-','','',''],
