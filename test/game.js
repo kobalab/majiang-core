@@ -1,6 +1,9 @@
 const assert = require('assert');
 
 const Majiang = require('../');
+Majiang.Dev = { Game: require('../dev/game') };
+
+const script = require('./data/script.json');
 
 let MSG = [];
 
@@ -2336,5 +2339,15 @@ suite('Majiang.Game', ()=>{
             let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
             assert.ok(Majiang.Game.allow_pingju(rule, shoupai, true));
         });
+    });
+
+    suite('シナリオ通りに局が進むこと', ()=>{
+        for (let paipu of script) {
+            test(paipu.title, ()=>{
+                const game = new Majiang.Dev.Game(
+                                JSON.parse(JSON.stringify(paipu))).do_sync();
+                assert.deepEqual(paipu, game._paipu);
+            });
+        }
     });
 });
