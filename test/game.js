@@ -1320,6 +1320,14 @@ suite('Majiang.Game', ()=>{
             game.next();
             assert.equal(game.last_paipu().dapai.p, 'm1_');
         });
+        test('槓ツモ', ()=>{
+            const game = init_game({shoupai:['_','','','']});
+            game.zimo();
+            game.gang('m1111');
+            game.gangzimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
     });
 
     suite('reply_dapai()', ()=>{
