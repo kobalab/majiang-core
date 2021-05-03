@@ -170,10 +170,15 @@ suite('Majiang.Game', ()=>{
 
         const game = new Majiang.Game();
 
-        test('停止すること', (done)=>{
-            game.stop(done);
+        test('停止すること', ()=>{
+            game.stop();
             assert.ok(game._stop);
             assert.ok(! game._timeout_id);
+            game._reply = [1,1,1,1];
+            game.next();
+        });
+        test('停止時に指定したコールバックが呼ばれること', (done)=>{
+            game.stop(done);
             game._reply = [1,1,1,1];
             game.next();
         });
