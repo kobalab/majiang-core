@@ -2,6 +2,9 @@
   "name": "@kobalab/majiang-core",
   "version": "0.0.1",
   "description": "麻雀基本ライブラリ",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha -u tdd",
