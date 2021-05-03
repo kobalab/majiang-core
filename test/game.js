@@ -35,7 +35,7 @@ function init_game(param = {}) {
 
     const players = [0,1,2,3].map(id => new Player(id));
     const rule = param.rule || Majiang.rule();
-    const game = new Majiang.Game(players, null, rule);
+    const game = new Majiang.Game(players, param.callback, rule);
 
     game.view = new View();
     game._sync = true;
@@ -1800,6 +1800,18 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.model.changbang, 2);
             assert.equal(game.model.lizhibang, 1);
             assert.ok(game.last_paipu().qipai);
+        });
+    });
+
+    suite('_callback()', ()=>{
+        test('終局時にコンストラクタで指定したコールバックが呼ばれること', (done)=>{
+            const game = init_game({rule:Majiang.rule({'場数':0}),
+                                    shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z2'],callback:done});
+            game.zimo();
+            game.hule();
+            game.next();
+            game.next();
         });
     });
 
