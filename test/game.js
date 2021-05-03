@@ -1319,6 +1319,15 @@ suite('Majiang.Game', ()=>{
             game.next();
             assert.ok(game.last_paipu().dapai);
         });
+        test('5つめのカンができないこと', ()=>{
+            const game = init_game({shoupai:['m123p456z1122,s888+','','',''],
+                                    zimo:['s8']});
+            game._n_gang = [0,0,0,4];
+            set_reply(game, [{gang:'s888+8'},{},{},{}]);
+            game.zimo();
+            game.next();
+            assert.ok(game.last_paipu().dapai);
+        });
         test('無応答のときにツモ切りすること', ()=>{
             const game = init_game({zimo:['m1']});
             game.zimo();
@@ -1570,6 +1579,15 @@ suite('Majiang.Game', ()=>{
             game.zimo();
             set_reply(game, [{},{},{},{fulou:'m1111+'}]);
             game.dapai('m2');
+            game.next();
+            assert.ok(game.last_paipu().zimo);
+        });
+        test('5つめのカンができないこと', ()=>{
+            const game = init_game({shoupai:['_','','','m111234p567s3378']});
+            game._n_gang = [4,0,0,0];
+            game.zimo();
+            set_reply(game, [{},{},{},{fulou:'m1111+'}]);
+            game.dapai('m1');
             game.next();
             assert.ok(game.last_paipu().zimo);
         });
