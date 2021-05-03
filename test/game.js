@@ -2158,6 +2158,13 @@ suite('Majiang.Game', ()=>{
                     Majiang.rule({'喰い替え許可レベル':2}), shoupai1, 'm1-', 0),
                 []);
         });
+        test('ツモした状態でチーできない', ()=>{
+            assert.ifError(
+                Majiang.Game.get_chi_mianzi(
+                    Majiang.rule(),
+                    Majiang.Shoupai.fromString('m123p456s12789z123'),
+                    's3-', 1));
+        });
     });
 
     suite('static get_peng_mianzi(rule, shoupai, p, paishu)', ()=>{
@@ -2174,6 +2181,13 @@ suite('Majiang.Game', ()=>{
                 Majiang.Game.get_peng_mianzi(
                     Majiang.rule({'喰い替え許可レベル':0}), shoupai, 'm1+', 0),
                 []));
+        test('ツモした状態でポンできない', ()=>{
+            assert.ifError(
+                Majiang.Game.get_peng_mianzi(
+                    Majiang.rule(),
+                    Majiang.Shoupai.fromString('m123p456s11789z123'),
+                    's1-', 1));
+        });
     });
 
     suite('static get_gang_mianzi(rule, shoupai, p, paishu)', ()=>{
