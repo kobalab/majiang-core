@@ -4,7 +4,7 @@
 
 ## インストール
 ```sh
-$ npm -i @kobalab/majiang-core
+$ npm i @kobalab/majiang-core
 ```
 
 ## 使用法
