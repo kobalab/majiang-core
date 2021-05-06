@@ -1266,7 +1266,7 @@ suite('Majiang.Game', ()=>{
         });
         test('九種九牌', ()=>{
             const game = init_game({shoupai:['m123459z1234567','','','']});
-            set_reply(game, [{pingju:'-'},{},{},{}]);
+            set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
             assert.equal(game.last_paipu().pingju.name, '九種九牌');
