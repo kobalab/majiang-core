@@ -1266,7 +1266,7 @@ suite('Majiang.Game', ()=>{
         });
         test('九種九牌', ()=>{
             const game = init_game({shoupai:['m123459z1234567','','','']});
-            set_reply(game, [{pingju:'-'},{},{},{}]);
+            set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
             assert.equal(game.last_paipu().pingju.name, '九種九牌');
@@ -1557,7 +1557,7 @@ suite('Majiang.Game', ()=>{
                                              'm23467789p34599','_']});
             game.zimo();
             while (game.model.shan.paishu) game.model.shan.zimo();
-            set_reply(game, [{},{shoupai:'-'},{shoupai:'-'},{}]);
+            set_reply(game, [{},{daopai:'-'},{daopai:'-'},{}]);
             game.dapai(game.model.shoupai[0].get_dapai()[0]);
             game.next();
             assert.equal(game.last_paipu().pingju.name, '荒牌平局');
