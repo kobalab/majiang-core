@@ -130,41 +130,49 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('speed()', ()=>{
+        test('speed が変更できること', ()=>{
+            const game = new Majiang.Game();
+            game.speed = 5;
+            assert.equal(game.speed, 5);
+        });
+    });
+
     suite('delay(callback, timeout)', ()=>{
 
         const game = new Majiang.Game();
 
         test('speed: 0 → 0ms', (done)=>{
             let called;
-            game._speed = 0;
+            game.speed = 0;
             game.delay(()=>{ called = 1 });
             assert.ifError(called);
             setTimeout(()=>{ assert.ok(called); done() }, 0);
         });
         test('speed: 1 → 500ms', (done)=>{
             let called;
-            game._speed = 1;
+            game.speed = 1;
             game.delay(()=>{ called = 1 });
             setTimeout(()=>{ assert.ifError(called)    }, 200);
             setTimeout(()=>{ assert.ok(called); done() }, 500);
         });
         test('speed: 3 → 600ms', (done)=>{
             let called;
-            game._speed = 3;
+            game.speed = 3;
             game.delay(()=>{ called = 1 });
             setTimeout(()=>{ assert.ifError(called)    }, 500);
             setTimeout(()=>{ assert.ok(called); done() }, 600);
         });
         test('speed: 0, timeout: 100 → 0ms', (done)=>{
             let called;
-            game._speed = 0;
+            game.speed = 0;
             game.delay(()=>{ called = 1 }, 100);
             assert.ifError(called);
             setTimeout(()=>{ assert.ok(called); done() }, 0);
         });
         test('speed: 5, timeout: 100 → 100ms', (done)=>{
             let called;
-            game._speed = 5;
+            game.speed = 5;
             game.delay(()=>{ called = 1 }, 100);
             setTimeout(()=>{ assert.ifError(called)    }, 0);
             setTimeout(()=>{ assert.ok(called); done() }, 100);
@@ -231,7 +239,7 @@ suite('Majiang.Game', ()=>{
 
         const players = [0,1,2,3].map(id => new Player(id));
         const game = new Majiang.Game(players);
-        game._speed = 1;
+        game.speed = 1;
         let type = 'test';
         let msg  = ['a','b','c','d'];
 
@@ -261,7 +269,7 @@ suite('Majiang.Game', ()=>{
         const rule = Majiang.rule();
         const game = new Majiang.Game(players, rule);
         game.view = new View();
-        game._speed = 0;
+        game.speed = 0;
         game._sync = true;
         game.stop();
 
