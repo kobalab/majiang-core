@@ -1273,7 +1273,7 @@ suite('Majiang.Game', ()=>{
         });
         test('九種九牌(不正応答)', ()=>{
             const game = init_game({shoupai:['m234567z1234567','','','']});
-            set_reply(game, [{pingju:'-'},{},{},{}]);
+            set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
             assert.ok(game.last_paipu().dapai);
@@ -1281,7 +1281,7 @@ suite('Majiang.Game', ()=>{
         test('途中流局なしの場合は九種九牌にできないこと', ()=>{
             const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
                                     shoupai:['m123459z1234567','','','']});
-            set_reply(game, [{pingju:'-'},{},{},{}]);
+            set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
             assert.ok(game.last_paipu().dapai);
