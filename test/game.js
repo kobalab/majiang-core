@@ -1085,6 +1085,12 @@ suite('Majiang.Game', ()=>{
             game.last();
             assert.equal(game._status, 'jieju');
         });
+        test('トビ終了なし', ()=>{
+            const game = init_game({rule:Majiang.rule({'トビ終了あり':false}),
+                                    defen:[50100,30000,20000,-100]});
+            game.last();
+            assert.equal(game._status, 'qipai');
+        });
         test('オーラス止め(東風戦)', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':1}),
                                     defen:[40000,30000,20000,10000]});
