@@ -91,6 +91,11 @@ function set_reply(game, reply) {
     }
 }
 
+function last_paipu(game, i = 0) {
+    let log = game._paipu.log[game._paipu.log.length - 1];
+    return log[log.length - 1 + i];
+}
+
 suite('Majiang.Game', ()=>{
 
     test('クラスが存在すること', ()=> assert.ok(Majiang.Game));
@@ -125,41 +130,49 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('speed()', ()=>{
+        test('speed が変更できること', ()=>{
+            const game = new Majiang.Game();
+            game.speed = 5;
+            assert.equal(game.speed, 5);
+        });
+    });
+
     suite('delay(callback, timeout)', ()=>{
 
         const game = new Majiang.Game();
 
         test('speed: 0 → 0ms', (done)=>{
             let called;
-            game._speed = 0;
+            game.speed = 0;
             game.delay(()=>{ called = 1 });
             assert.ifError(called);
             setTimeout(()=>{ assert.ok(called); done() }, 0);
         });
         test('speed: 1 → 500ms', (done)=>{
             let called;
-            game._speed = 1;
+            game.speed = 1;
             game.delay(()=>{ called = 1 });
             setTimeout(()=>{ assert.ifError(called)    }, 200);
             setTimeout(()=>{ assert.ok(called); done() }, 500);
         });
         test('speed: 3 → 600ms', (done)=>{
             let called;
-            game._speed = 3;
+            game.speed = 3;
             game.delay(()=>{ called = 1 });
             setTimeout(()=>{ assert.ifError(called)    }, 500);
             setTimeout(()=>{ assert.ok(called); done() }, 600);
         });
         test('speed: 0, timeout: 100 → 0ms', (done)=>{
             let called;
-            game._speed = 0;
+            game.speed = 0;
             game.delay(()=>{ called = 1 }, 100);
             assert.ifError(called);
             setTimeout(()=>{ assert.ok(called); done() }, 0);
         });
         test('speed: 5, timeout: 100 → 100ms', (done)=>{
             let called;
-            game._speed = 5;
+            game.speed = 5;
             game.delay(()=>{ called = 1 }, 100);
             setTimeout(()=>{ assert.ifError(called)    }, 0);
             setTimeout(()=>{ assert.ok(called); done() }, 100);
@@ -226,7 +239,7 @@ suite('Majiang.Game', ()=>{
 
         const players = [0,1,2,3].map(id => new Player(id));
         const game = new Majiang.Game(players);
-        game._speed = 1;
+        game.speed = 1;
         let type = 'test';
         let msg  = ['a','b','c','d'];
 
@@ -256,7 +269,7 @@ suite('Majiang.Game', ()=>{
         const rule = Majiang.rule();
         const game = new Majiang.Game(players, rule);
         game.view = new View();
-        game._speed = 0;
+        game.speed = 0;
         game._sync = true;
         game.stop();
 
@@ -325,7 +338,7 @@ suite('Majiang.Game', ()=>{
         });
         test('第一ツモ巡であること', ()=> assert.ok(game._diyizimo));
         test('四風連打中であること', ()=> assert.ok(game._fengpai));
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().qipai));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).qipai));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param, { redraw: null }));
         test('通知が伝わること', ()=>{
@@ -362,9 +375,9 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.model.shan.paishu, 69));
         test('手牌にツモ牌が加えられること', ()=>
             assert.ok(game.model.shoupai[0].get_dapai()));
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().zimo));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).zimo));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -389,9 +402,9 @@ suite('Majiang.Game', ()=>{
         });
         test('河に打牌されること', ()=>
             assert.equal(game.model.he[0]._pai[0], dapai));
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().dapai));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).dapai));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -499,9 +512,9 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.model.lunban, 1));
         test('手牌が副露されること', ()=>
             assert.equal(game.model.shoupai[1]._fulou[0], 'm12-3'));
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().fulou));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).fulou));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -542,9 +555,9 @@ suite('Majiang.Game', ()=>{
             game.gang('s555+0');
             assert.equal(game.model.shoupai[0]._fulou[0], 's555+0');
         });
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().gang));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).gang));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -581,10 +594,10 @@ suite('Majiang.Game', ()=>{
         });
         test('手牌にツモ牌が加えられること', ()=>
             assert.ok(game.model.shoupai[0].get_dapai()));
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu(-1).gangzimo));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game, -1).gangzimo));
         test('表示処理が呼び出されること', ()=>
             assert.deepEqual(game._view._param,
-                             { update: game.last_paipu(-1) }));
+                             { update: last_paipu(game, -1) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -657,9 +670,9 @@ suite('Majiang.Game', ()=>{
             assert.equal(game.model.shan.baopai.length, 2);
             assert.ok(! game._gang);
         });
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().kaigang));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).kaigang));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -687,10 +700,10 @@ suite('Majiang.Game', ()=>{
             game.dapai('z1');
             game._hule = [2];
             game.hule();
-            assert.ok(game.last_paipu().hule);
+            assert.ok(last_paipu(game).hule);
         });
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -707,8 +720,8 @@ suite('Majiang.Game', ()=>{
             game.dapai('z1');
             game._hule = [0];
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '立直'));
-            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '一発'));
+            assert.ok(last_paipu(game).hule.hupai.find(h=>h.name == '立直'));
+            assert.ok(last_paipu(game).hule.hupai.find(h=>h.name == '一発'));
         });
         test('ダブル立直', ()=>{
             const game = init_game({shoupai:['m123p456s789z1122','_','','']});
@@ -718,7 +731,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('z1');
             game._hule = [0];
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai
+            assert.ok(last_paipu(game).hule.hupai
                                     .find(h=>h.name == 'ダブル立直'));
         });
         test('槍槓', ()=>{
@@ -728,7 +741,7 @@ suite('Majiang.Game', ()=>{
             game.gang('m111=1');
             game._hule = [2];
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '槍槓'));
+            assert.ok(last_paipu(game).hule.hupai.find(h=>h.name == '槍槓'));
         });
         test('嶺上開花', ()=>{
             const game = init_game({shoupai:['m123p456s78z11,m111=','','',''],
@@ -737,7 +750,7 @@ suite('Majiang.Game', ()=>{
             game.gang('m111=1');
             game.gangzimo();
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai
+            assert.ok(last_paipu(game).hule.hupai
                                     .find(h=>h.name == '嶺上開花'));
         });
         test('最終牌で嶺上開花', ()=>{
@@ -749,7 +762,7 @@ suite('Majiang.Game', ()=>{
             while (game.model.shan.paishu > 1) game.model.shan.zimo();
             game.gangzimo();
             game.hule();
-            assert.ok(! game.last_paipu().hule.hupai
+            assert.ok(! last_paipu(game).hule.hupai
                                     .find(h=>h.name == '海底摸月'));
         });
         test('海底摸月', ()=>{
@@ -759,7 +772,7 @@ suite('Majiang.Game', ()=>{
             game.zimo();
             while (game.model.shan.paishu > 0) game.model.shan.zimo();
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai
+            assert.ok(last_paipu(game).hule.hupai
                                     .find(h=>h.name == '海底摸月'));
         });
         test('河底撈魚', ()=>{
@@ -770,7 +783,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('z2');
             game._hule = [2];
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai
+            assert.ok(last_paipu(game).hule.hupai
                                     .find(h=>h.name == '河底撈魚'));
         });
         test('天和', ()=>{
@@ -778,7 +791,7 @@ suite('Majiang.Game', ()=>{
                                     zimo:['z2']});
             game.zimo();
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '天和'));
+            assert.ok(last_paipu(game).hule.hupai.find(h=>h.name == '天和'));
         });
         test('地和', ()=>{
             const game = init_game({shoupai:['_','m123p456s789z1122','',''],
@@ -787,7 +800,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1_');
             game.zimo();
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '地和'));
+            assert.ok(last_paipu(game).hule.hupai.find(h=>h.name == '地和'));
         });
         test('槍槓でダブロン', ()=>{
             const game = init_game({shoupai:['__________,m111=',
@@ -798,7 +811,7 @@ suite('Majiang.Game', ()=>{
             game._hule = [ 1, 2 ];
             game.hule();
             game.hule();
-            assert.ok(game.last_paipu().hule.hupai.find(h=>h.name == '槍槓'));
+            assert.ok(last_paipu(game).hule.hupai.find(h=>h.name == '槍槓'));
         });
         test('子の和了は輪荘', ()=>{
             const game = init_game({shoupai:['_','m123p456s789z1122','','']});
@@ -855,9 +868,9 @@ suite('Majiang.Game', ()=>{
             assert.ok(game._no_game);
             assert.ok(game._lianzhuang);
         });
-        test('牌譜が記録されること', ()=> assert.ok(game.last_paipu().pingju));
+        test('牌譜が記録されること', ()=> assert.ok(last_paipu(game).pingju));
         test('表示処理が呼び出されること', ()=>
-            assert.deepEqual(game._view._param, { update: game.last_paipu() }));
+            assert.deepEqual(game._view._param, { update: last_paipu(game) }));
         test('通知が伝わること', ()=>{
             for (let l = 0; l < 4; l++) {
                 let id = game.model.player_id[l];
@@ -872,8 +885,8 @@ suite('Majiang.Game', ()=>{
                                              'm67p678s22,s56-7,p444-',
                                              'm12345p33s333,m406-']});
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.equal(game.last_paipu().pingju.shoupai
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.shoupai
                                             .filter(s=>s).length, 4)
             assert.deepEqual(game._fenpei, [0,0,0,0]);
         });
@@ -884,8 +897,8 @@ suite('Majiang.Game', ()=>{
                                              'm3p1234689z55,s7-89',
                                              'm2233467p234555']});
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.equal(game.last_paipu().pingju.shoupai
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.shoupai
                                             .filter(s=>s).length, 0)
             assert.deepEqual(game._fenpei, [0,0,0,0]);
         });
@@ -896,8 +909,8 @@ suite('Majiang.Game', ()=>{
                                              'm3p1234689z55,s7-89',
                                              'm12345p33s333,m406-']});
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.equal(game.last_paipu().pingju.shoupai
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.shoupai
                                             .filter(s=>s).length, 2)
             assert.deepEqual(game._fenpei, [1500,-1500,-1500,1500]);
         });
@@ -908,8 +921,8 @@ suite('Majiang.Game', ()=>{
                                              'm3p1234689z55,s7-89',
                                              'm12345p33s333,m406-']});
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.equal(game.last_paipu().pingju.shoupai
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.shoupai
                                             .filter(s=>s).length, 1)
             assert.deepEqual(game._fenpei, [-1000,-1000,-1000,3000]);
         });
@@ -921,8 +934,8 @@ suite('Majiang.Game', ()=>{
                                              'm67p678s22,s56-7,p444-',
                                              'm12345p33s333,m406-']});
             game.pingju('',['','_','_','_']);
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.equal(game.last_paipu().pingju.shoupai
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.shoupai
                                             .filter(s=>s).length, 3)
             assert.deepEqual(game._fenpei, [-3000,1000,1000,1000]);
         });
@@ -931,8 +944,8 @@ suite('Majiang.Game', ()=>{
                                                        'ノーテン宣言あり':true}),
                                     shoupai:['m22p12366s406789*','','','']});
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.ok(game.last_paipu().pingju.shoupai[0]);
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.ok(last_paipu(game).pingju.shoupai[0]);
         });
         test('ノーテン罰なし', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
@@ -942,8 +955,8 @@ suite('Majiang.Game', ()=>{
                                              'm3p1234689z55,s7-89',
                                              'm12345p33s333,m406-']});
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.equal(game.last_paipu().pingju.shoupai
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.shoupai
                                             .filter(s=>s).length, 2)
             assert.deepEqual(game._fenpei, [0,0,0,0]);
         });
@@ -1002,7 +1015,7 @@ suite('Majiang.Game', ()=>{
             game.zimo(); game.dapai('p2');
             game.zimo(); game.dapai('s2');
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '流し満貫');
+            assert.equal(last_paipu(game).pingju.name, '流し満貫');
             assert.deepEqual(game._fenpei, [12000,-4000,-4000,-4000]);
         });
         test('鳴かれた場合、流し満貫は成立しない', ()=>{
@@ -1012,7 +1025,7 @@ suite('Majiang.Game', ()=>{
             game.zimo(); game.dapai('p2');
             game.zimo(); game.dapai('s2');
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
         });
         test('2人が流し満貫', ()=>{
             const game = init_game({shoupai:['_','_','_','_']});
@@ -1021,7 +1034,7 @@ suite('Majiang.Game', ()=>{
             game.zimo(); game.dapai('p2');
             game.zimo(); game.dapai('s2');
             game.pingju();
-            assert.equal(game.last_paipu().pingju.name, '流し満貫');
+            assert.equal(last_paipu(game).pingju.name, '流し満貫');
             assert.deepEqual(game._fenpei, [8000,4000,-6000,-6000]);
         });
     });
@@ -1071,6 +1084,12 @@ suite('Majiang.Game', ()=>{
             game._lianzhuang = true;
             game.last();
             assert.equal(game._status, 'jieju');
+        });
+        test('トビ終了なし', ()=>{
+            const game = init_game({rule:Majiang.rule({'トビ終了あり':false}),
+                                    defen:[50100,30000,20000,-100]});
+            game.last();
+            assert.equal(game._status, 'qipai');
         });
         test('オーラス止め(東風戦)', ()=>{
             const game = init_game({rule:Majiang.rule({'場数':1}),
@@ -1228,7 +1247,7 @@ suite('Majiang.Game', ()=>{
             game._sync = true;
             game.kaiju();
             game.next();
-            assert.ok(game.last_paipu().qipai);
+            assert.ok(last_paipu(game).qipai);
         });
     });
 
@@ -1237,7 +1256,7 @@ suite('Majiang.Game', ()=>{
             const game = init_game();
             game.qipai();
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
     });
 
@@ -1247,7 +1266,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{dapai:'m1_'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.equal(game.last_paipu().dapai.p, 'm1_');
+            assert.equal(last_paipu(game).dapai.p, 'm1_');
         });
         test('リーチ', ()=>{
             const game = init_game({shoupai:['m123p456s789z1122','','',''],
@@ -1255,36 +1274,36 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{dapai:'m1_*'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.equal(game.last_paipu().dapai.p, 'm1_*');
+            assert.equal(last_paipu(game).dapai.p, 'm1_*');
         });
         test('打牌(不正応答)', ()=>{
             const game = init_game({zimo:['m1']});
             set_reply(game, [{dapai:'m2_'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
         test('九種九牌', ()=>{
             const game = init_game({shoupai:['m123459z1234567','','','']});
             set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.equal(game.last_paipu().pingju.name, '九種九牌');
+            assert.equal(last_paipu(game).pingju.name, '九種九牌');
         });
         test('九種九牌(不正応答)', ()=>{
             const game = init_game({shoupai:['m234567z1234567','','','']});
-            set_reply(game, [{pingju:'-'},{},{},{}]);
+            set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
         test('途中流局なしの場合は九種九牌にできないこと', ()=>{
             const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
                                     shoupai:['m123459z1234567','','','']});
-            set_reply(game, [{pingju:'-'},{},{},{}]);
+            set_reply(game, [{daopai:'-'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
         test('ツモ和了', ()=>{
             const game = init_game({shoupai:['m123p456s789z1122','','',''],
@@ -1293,7 +1312,7 @@ suite('Majiang.Game', ()=>{
             game.zimo();
             game.next();
             assert.deepEqual(game._view._say, ['zimo', 0]);
-            assert.ok(game.last_paipu().hule);
+            assert.ok(last_paipu(game).hule);
         });
         test('ツモ和了(不正応答)', ()=>{
             const game = init_game({shoupai:['m123p456s789z1122','','',''],
@@ -1301,7 +1320,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{hule:'-'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
         test('カン', ()=>{
             const game = init_game({shoupai:['m123p456z1122,s888+','','',''],
@@ -1309,7 +1328,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{gang:'s888+8'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().gang.m, 's888+8');
+            assert.ok(last_paipu(game).gang.m, 's888+8');
         });
         test('カン(不正応答)', ()=>{
             const game = init_game({shoupai:['m123p456z1122,s888+','','',''],
@@ -1317,7 +1336,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{gang:'s888+8'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
         test('5つめのカンができないこと', ()=>{
             const game = init_game({shoupai:['m123p456z1122,s888+','','',''],
@@ -1326,13 +1345,13 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{gang:'s888+8'},{},{},{}]);
             game.zimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
         test('無応答のときにツモ切りすること', ()=>{
             const game = init_game({zimo:['m1']});
             game.zimo();
             game.next();
-            assert.equal(game.last_paipu().dapai.p, 'm1_');
+            assert.equal(last_paipu(game).dapai.p, 'm1_');
         });
         test('槓ツモ', ()=>{
             const game = init_game({shoupai:['_','','','']});
@@ -1340,7 +1359,7 @@ suite('Majiang.Game', ()=>{
             game.gang('m1111');
             game.gangzimo();
             game.next();
-            assert.ok(game.last_paipu().dapai);
+            assert.ok(last_paipu(game).dapai);
         });
     });
 
@@ -1350,7 +1369,7 @@ suite('Majiang.Game', ()=>{
             game.zimo();
             game.dapai('m1');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('ロン和了', ()=>{
             const game = init_game({shoupai:['_','m123p456s789z1122','','']});
@@ -1359,7 +1378,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('z1');
             game.next();
             assert.deepEqual(game._view._say, ['rong', 1]);
-            assert.equal(game.last_paipu().hule.l, 1);
+            assert.equal(last_paipu(game).hule.l, 1);
         });
         test('和了見逃しでフリテンになること', ()=>{
             const game = init_game({shoupai:['_','m123p456s789z1122','','']});
@@ -1375,7 +1394,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.dapai('m5*');
             game.next();
-            assert.equal(game.last_paipu().hule.l, 1);
+            assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, [2]);
         });
         test('ダブロンを頭ハネに変更できること', ()=>{
@@ -1386,7 +1405,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.dapai('m5*');
             game.next();
-            assert.equal(game.last_paipu().hule.l, 1);
+            assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, []);
         });
         test('三家和', ()=>{
@@ -1397,8 +1416,8 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{hule:'-'}]);
             game.dapai('m5*');
             game.next();
-            assert.equal(game.last_paipu().pingju.name, '三家和');
-            assert.deepEqual(game.last_paipu().pingju.shoupai,
+            assert.equal(last_paipu(game).pingju.name, '三家和');
+            assert.deepEqual(last_paipu(game).pingju.shoupai,
                              ['','m23446p45688s345',
                               'm34s33,s444-,s666+,p406-',
                               'm23467s88,s222+,z666=']);
@@ -1412,7 +1431,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{hule:'-'}]);
             game.dapai('m5*');
             game.next();
-            assert.equal(game.last_paipu().hule.l, 1);
+            assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, [2, 3]);
         });
         test('リーチ成立', ()=>{
@@ -1423,7 +1442,7 @@ suite('Majiang.Game', ()=>{
             game.next();
             assert.equal(game.model.defen[0], 24000);
             assert.equal(game.model.lizhibang, 1);
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('リーチ不成立', ()=>{
             const game = init_game({shoupai:['m55688p234567s06',
@@ -1435,7 +1454,7 @@ suite('Majiang.Game', ()=>{
             game.next();
             assert.equal(game.model.defen[0], 25000);
             assert.equal(game.model.lizhibang, 0);
-            assert.ok(game.last_paipu().hule);
+            assert.ok(last_paipu(game).hule);
         });
         test('四家立直', ()=>{
             const game = init_game({shoupai:['m11156p5688s2346',
@@ -1448,8 +1467,8 @@ suite('Majiang.Game', ()=>{
                 game.dapai(p);
             }
             game.next();
-            assert.equal(game.last_paipu().pingju.name, '四家立直');
-            assert.deepEqual(game.last_paipu().pingju.shoupai,
+            assert.equal(last_paipu(game).pingju.name, '四家立直');
+            assert.deepEqual(last_paipu(game).pingju.shoupai,
                              ['m11156p45688s234*',
                               'm222p11340s12356*',
                               'm23467789p34599*',
@@ -1467,7 +1486,7 @@ suite('Majiang.Game', ()=>{
                 game.dapai(p);
             }
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('四風連打', ()=>{
             const game = init_game({shoupai:['_','_','_','_']});
@@ -1476,8 +1495,8 @@ suite('Majiang.Game', ()=>{
                 game.dapai('z1');
             }
             game.next();
-            assert.equal(game.last_paipu().pingju.name, '四風連打');
-            assert.deepEqual(game.last_paipu().pingju.shoupai, ['','','','']);
+            assert.equal(last_paipu(game).pingju.name, '四風連打');
+            assert.deepEqual(last_paipu(game).pingju.shoupai, ['','','','']);
         });
         test('途中流局なしの場合は四風連打とならず、第一ツモ巡が終了すること', ()=>{
             const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
@@ -1488,7 +1507,7 @@ suite('Majiang.Game', ()=>{
             }
             game.next();
             assert.ok(! game._diyizimo);
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('四開槓', ()=>{
             const game = init_game({shoupai:['_','m111p22279s57,s333=',
@@ -1508,8 +1527,8 @@ suite('Majiang.Game', ()=>{
             game.gangzimo();
             game.dapai('z7_');
             game.next();
-            assert.equal(game.last_paipu().pingju.name, '四開槓');
-            assert.deepEqual(game.last_paipu().pingju.shoupai, ['','','','']);
+            assert.equal(last_paipu(game).pingju.name, '四開槓');
+            assert.deepEqual(last_paipu(game).pingju.shoupai, ['','','','']);
         });
         test('1人で四開槓', ()=>{
             const game = init_game({shoupai:['m1112,p111+,s111=,z111-',
@@ -1527,7 +1546,7 @@ suite('Majiang.Game', ()=>{
             game.gangzimo();
             game.dapai('z7');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('途中流局なしでは四開槓とならない', ()=>{
             const game = init_game({rule:Majiang.rule({'途中流局あり':false}),
@@ -1548,7 +1567,7 @@ suite('Majiang.Game', ()=>{
             game.gangzimo();
             game.dapai('z7_');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('流局', ()=>{
             const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
@@ -1560,8 +1579,8 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{daopai:'-'},{daopai:'-'},{}]);
             game.dapai(game.model.shoupai[0].get_dapai()[0]);
             game.next();
-            assert.equal(game.last_paipu().pingju.name, '荒牌平局');
-            assert.deepEqual(game.last_paipu().pingju.shoupai,
+            assert.equal(last_paipu(game).pingju.name, '荒牌平局');
+            assert.deepEqual(last_paipu(game).pingju.shoupai,
                              ['','m222p11340s12356',
                               'm23467789p34599','']);
         });
@@ -1572,7 +1591,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1');
             game.next();
             assert.deepEqual(game._view._say, ['gang', 3]);
-            assert.equal(game.last_paipu().fulou.m, 'm1111+');
+            assert.equal(last_paipu(game).fulou.m, 'm1111+');
         });
         test('カン(不正応答)', ()=>{
             const game = init_game({shoupai:['_','','','m111234p567s3378']});
@@ -1580,7 +1599,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{},{},{fulou:'m1111+'}]);
             game.dapai('m2');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('5つめのカンができないこと', ()=>{
             const game = init_game({shoupai:['_','','','m111234p567s3378']});
@@ -1589,7 +1608,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{},{},{fulou:'m1111+'}]);
             game.dapai('m1');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('ポン', ()=>{
             const game = init_game({shoupai:['_','','m112345p567s3378','']});
@@ -1598,7 +1617,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1');
             game.next();
             assert.deepEqual(game._view._say, ['peng', 2]);
-            assert.equal(game.last_paipu().fulou.m, 'm111=');
+            assert.equal(last_paipu(game).fulou.m, 'm111=');
         });
         test('ポン(不正応答)', ()=>{
             const game = init_game({shoupai:['_','','m112345p567s3378','']});
@@ -1606,7 +1625,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{},{fulou:'m111='},{}]);
             game.dapai('m2');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('チー', ()=>{
             const game = init_game({shoupai:['_','m112345p567s3378','','']});
@@ -1615,7 +1634,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m6');
             game.next();
             assert.deepEqual(game._view._say, ['chi', 1]);
-            assert.equal(game.last_paipu().fulou.m, 'm456-');
+            assert.equal(last_paipu(game).fulou.m, 'm456-');
         });
         test('チー(不正応答)', ()=>{
             const game = init_game({shoupai:['_','m112345p567s3378','','']});
@@ -1623,7 +1642,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{fulou:'m456-'},{},{}]);
             game.dapai('m5');
             game.next();
-            assert.ok(game.last_paipu().zimo);
+            assert.ok(last_paipu(game).zimo);
         });
         test('ポンとチーの競合はポンを優先', ()=>{
             const game = init_game({shoupai:['_','m23567p456s889z11',
@@ -1633,7 +1652,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1');
             game.next();
             assert.deepEqual(game._view._say, ['peng', 2]);
-            assert.equal(game.last_paipu().fulou.m, 'm111=');
+            assert.equal(last_paipu(game).fulou.m, 'm111=');
         })
     });
 
@@ -1644,7 +1663,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1');
             game.fulou('m1111-');
             game.next();
-            assert.ok(game.last_paipu().gangzimo);
+            assert.ok(last_paipu(game).gangzimo);
         });
         test('チー・ポン → 打牌', ()=>{
             const game = init_game({shoupai:['_','m23567p456s889z11','','']});
@@ -1653,7 +1672,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{dapai:'s9'},{},{}]);
             game.fulou('m1-23');
             game.next();
-            assert.equal(game.last_paipu().dapai.p, 's9');
+            assert.equal(last_paipu(game).dapai.p, 's9');
         });
         test('チー・ポン → 打牌(不正応答)', ()=>{
             const game = init_game({shoupai:['_','m23456p456s889z11','','']});
@@ -1662,7 +1681,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{dapai:'m4'},{},{}]);
             game.fulou('m1-23');
             game.next();
-            assert.equal(game.last_paipu().dapai.p, 'z1');
+            assert.equal(last_paipu(game).dapai.p, 'z1');
         });
         test('無応答のときに右端の牌を切ること', ()=>{
             const game = init_game({shoupai:['_','m23567p456s889z11','','']});
@@ -1670,7 +1689,7 @@ suite('Majiang.Game', ()=>{
             game.dapai('m1');
             game.fulou('m1-23');
             game.next();
-            assert.equal(game.last_paipu().dapai.p, 'z1');
+            assert.equal(last_paipu(game).dapai.p, 'z1');
         });
     });
 
@@ -1681,7 +1700,7 @@ suite('Majiang.Game', ()=>{
             game.zimo();
             game.gang('m111+1');
             game.next();
-            assert.ok(game.last_paipu().gangzimo);
+            assert.ok(last_paipu(game).gangzimo);
         });
         test('ロン和了(槍槓)', ()=>{
             const game = init_game({shoupai:['m45p456s11789,m111+','',
@@ -1692,7 +1711,7 @@ suite('Majiang.Game', ()=>{
             game.gang('m111+1');
             game.next();
             assert.deepEqual(game._view._say, ['rong', 3]);
-            assert.equal(game.last_paipu().hule.l, 3);
+            assert.equal(last_paipu(game).hule.l, 3);
         });
         test('ロン和了(不正応答)', ()=>{
             const game = init_game({shoupai:['m45p456s11789,m111+','',
@@ -1702,7 +1721,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{},{},{hule:'-'}]);
             game.gang('m111+1');
             game.next();
-            assert.ok(game.last_paipu().gangzimo);
+            assert.ok(last_paipu(game).gangzimo);
         });
         test('暗槓は槍槓できない', ()=>{
             const game = init_game({shoupai:['m11145p456s11789','',
@@ -1712,8 +1731,8 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{},{},{hule:'-'}]);
             game.gang('m1111');
             game.next();
-            assert.ok(game.last_paipu(-1).gangzimo);
-            assert.ok(game.last_paipu().kaigang);
+            assert.ok(last_paipu(game, -1).gangzimo);
+            assert.ok(last_paipu(game).kaigang);
         });
         test('和了見逃しでフリテンになること', ()=>{
             const game = init_game({shoupai:['m45p456s11789,m111+','',
@@ -1733,7 +1752,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.gang('m505-5');
             game.next();
-            assert.equal(game.last_paipu().hule.l, 1);
+            assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, [2]);
         });
         test('ダブロンを頭ハネに変更できること', ()=>{
@@ -1746,7 +1765,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.gang('m505-5');
             game.next();
-            assert.equal(game.last_paipu().hule.l, 1);
+            assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, []);
         });
     });
@@ -1765,7 +1784,7 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.model.defen, [28400,24200,24200,23200]);
             assert.equal(game.model.changbang, 2);
             assert.equal(game.model.lizhibang, 0);
-            assert.ok(game.last_paipu().qipai)
+            assert.ok(last_paipu(game).qipai)
         });
         test('子のロン和了', ()=>{
             const game = init_game({shoupai:['_','m345567p111s66z11','',''],
@@ -1780,7 +1799,7 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.model.defen, [23100,27900,25000,24000]);
             assert.equal(game.model.changbang, 0);
             assert.equal(game.model.lizhibang, 0);
-            assert.ok(game.last_paipu().qipai)
+            assert.ok(last_paipu(game).qipai)
         });
         test('ダブロンで連荘', ()=>{
             const game = init_game({shoupai:['m23p456s789z11122','_',
@@ -1798,12 +1817,12 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.model.defen, [25000,23400,27600,24000]);
             assert.equal(game.model.changbang, 0);
             assert.equal(game.model.lizhibang, 0);
-            assert.ok(game.last_paipu().hule);
+            assert.ok(last_paipu(game).hule);
             game.next();
             assert.deepEqual(game.model.defen, [28900,19500,27600,24000]);
             assert.equal(game.model.changbang, 2);
             assert.equal(game.model.lizhibang, 0);
-            assert.ok(game.last_paipu().qipai);
+            assert.ok(last_paipu(game).qipai);
         })
     });
 
@@ -1822,7 +1841,7 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.model.defen, [28000,24000,24000,23000]);
             assert.equal(game.model.changbang, 2);
             assert.equal(game.model.lizhibang, 1);
-            assert.ok(game.last_paipu().qipai);
+            assert.ok(last_paipu(game).qipai);
         });
     });
 
