@@ -90,6 +90,11 @@ suite('Majiang.Board', ()=>{
             board.zimo({ l: 0, p: '' });
             assert.ok(board.shoupai[0].get_dapai());
         });
+        test('多牌となるツモができること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 0, p: 'm1' });
+            board.zimo({ l: 0, p: 'm2' });
+        });
     });
 
     suite('dapai(dapai)', ()=>{
@@ -100,6 +105,10 @@ suite('Majiang.Board', ()=>{
                 assert.ifError(board.shoupai[0].get_dapai()));
         test('捨て牌に加えられること', ()=>
                 assert.equal(board.he[0]._pai[0], 'm1_'));
+        test('少牌となる打牌ができること', ()=>{
+            const board = init_board();
+            board.dapai({ l: 0, p: 'm1' });
+        });
     });
 
     suite('fulou(fulou)', ()=>{
@@ -113,6 +122,12 @@ suite('Majiang.Board', ()=>{
                 assert.equal(board.lunban, 2));
         test('手牌が副露されること', ()=>
                 assert.equal(board.shoupai[2]._fulou[0], 'm111='));
+        test('多牌となる副露ができること', ()=>{
+        const board = init_board();
+        board.zimo({ l: 0, p: 'm1' });
+        board.dapai({ l: 2, p: 'm1' });
+        board.fulou({ l: 0, m: 'm111=' });
+        });
     });
 
     suite('gang(gang)', ()=>{
@@ -121,6 +136,10 @@ suite('Majiang.Board', ()=>{
         board.gang({ l: 0, m: 'm1111' });
         test('手牌が副露されること', ()=>
                 assert.equal(board.shoupai[0]._fulou[0], 'm1111'));
+        test('少牌となるカンができること', ()=>{
+            const board = init_board();
+            board.gang({ l: 0, m: 'm1111' });
+        });
     });
 
     suite('kaigang(kaigang)', ()=>{
