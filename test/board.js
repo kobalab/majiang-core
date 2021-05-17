@@ -90,6 +90,14 @@ suite('Majiang.Board', ()=>{
             board.zimo({ l: 0, p: '' });
             assert.ok(board.shoupai[0].get_dapai());
         });
+        test('リーチ宣言後のツモでリーチが成立すること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 0, p: 'm1' });
+            board.dapai({ l: 0, p: 'm1_*' });
+            board.zimo({ l: 1, p: 's9' });
+            assert.equal(board.defen[board.player_id[0]], 9000);
+            assert.equal(board.lizhibang, 5);
+        });
         test('多牌となるツモができること', ()=>{
             const board = init_board();
             board.zimo({ l: 0, p: 'm1' });
@@ -122,6 +130,14 @@ suite('Majiang.Board', ()=>{
                 assert.equal(board.lunban, 2));
         test('手牌が副露されること', ()=>
                 assert.equal(board.shoupai[2]._fulou[0], 'm111='));
+        test('リーチ宣言後の副露でリーチが成立すること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 0, p: 'm1' });
+            board.dapai({ l: 0, p: 'm1_*' });
+            board.fulou({ l: 2, m: 'm111=' });
+            assert.equal(board.defen[board.player_id[0]], 9000);
+            assert.equal(board.lizhibang, 5);
+        });
         test('多牌となる副露ができること', ()=>{
         const board = init_board();
         board.zimo({ l: 0, p: 'm1' });
@@ -157,5 +173,24 @@ suite('Majiang.Board', ()=>{
         board.hule({ fubaopai: ['s9'] });
         test('裏ドラを参照できること', ()=>
                 assert.equal(board.shan.fubaopai[0], 's9'));
+    });
+
+    suite('pingju(pingju)', ()=>{
+        test('リーチ宣言後の流局でリーチが成立すること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 0, p: 'm1' });
+            board.dapai({ l: 0, p: 'm1_*' });
+            board.pingju({ name: '荒牌平局' });
+            assert.equal(board.defen[board.player_id[0]], 9000);
+            assert.equal(board.lizhibang, 5);
+        });
+        test('三家和の場合はリーチが成立しないこと', ()=>{
+            const board = init_board();
+            board.zimo({ l: 0, p: 'm1' });
+            board.dapai({ l: 0, p: 'm1_*' });
+            board.pingju({ name: '三家和' });
+            assert.equal(board.defen[board.player_id[0]], 10000);
+            assert.equal(board.lizhibang, 4);
+        });
     });
 });
