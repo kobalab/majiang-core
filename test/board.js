@@ -15,7 +15,7 @@ function init_board(param = {}) {
         jushu:      2,
         changbang:  3,
         lizhibang:  4,
-        defen:      [10000, 20000, 30000, 40000],
+        defen:      [10000, 20000, 30000, 36000],
         baopai:     'm1',
         shoupai:    ['','','','']
     };
@@ -54,7 +54,7 @@ suite('Majiang.Board', ()=>{
             jushu:      2,
             changbang:  3,
             lizhibang:  4,
-            defen:      [10000, 20000, 30000, 40000],
+            defen:      [10000, 20000, 30000, 36000],
             baopai:     'm1',
             shoupai:    ['','m123p456s789z1234','','']
         };
@@ -173,6 +173,24 @@ suite('Majiang.Board', ()=>{
         board.hule({ fubaopai: ['s9'] });
         test('裏ドラを参照できること', ()=>
                 assert.equal(board.shan.fubaopai[0], 's9'));
+        test('ダブロンの際に持ち点の移動が反映されていること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 1, p: '' });
+            board.dapai({ l: 1, p: 'p4_' });
+            board.hule({ l: 2, shoupai: 'm444678p44s33p4,s505=', baojia: 1,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2000,
+                         hupai: [ { name: '断幺九', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 0, -2900, 6900, 0 ] });
+            board.hule({ l: 0, shoupai: 'p06s12344p4,z777-,p333+', baojia: 1,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2900,
+                         hupai: [ { name: '役牌 中', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 0, -2900, 2900, 0 ] });
+            assert.equal(board.changbang, 0);
+            assert.equal(board.lizhibang, 0);
+            assert.deepEqual(board.defen, [ 17100, 36900, 36000, 10000 ]);
+        });
     });
 
     suite('pingju(pingju)', ()=>{
