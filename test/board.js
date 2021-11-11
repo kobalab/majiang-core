@@ -41,8 +41,6 @@ suite('Majiang.Board', ()=>{
             assert.deepEqual(board.player, ['私','下家','対面','上家']));
         test('起家が設定されること', ()=>
             assert.equal(board.qijia, 1));
-        test('引数なしでもインスタンスが生成できること', ()=>
-            assert.ok(new Majiang.Board()));
     });
 
     suite('qipai(qipai)', ()=>{
