@@ -1,3 +1,11 @@
+### v0.0.5 / 2021-11-13
+
+ - Majiang.Player を追加
+ - 脆弱性警告に対応
+   - mocha 8.4.0 → 9.1.3
+   - ansi-regex 5.0.0 → 5.0.1
+   - browserslist 4.16.3 → 4.17.6
+
 ### v0.0.4 / 2021-05-23
 
  - Majiang.Board を追加
