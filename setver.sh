@@ -3,7 +3,7 @@ set -e
 
 [ $1 ] || (echo "Usage: $0 version"; exit 1)
 
-version=$1
+version=`echo $1 | sed 's/^[^0-9]*//'`
 
 npx semver ${version} || (echo "${version}: bad semver"; exit 1)
 
@@ -13,7 +13,7 @@ ex package.json <<++
 ++
 
 ex package-lock.json <<++
-    3s/"version":.*,/"version": "${version}",/
+    1,9s/"version":.*,/"version": "${version}",/
     w!
 ++
 
