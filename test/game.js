@@ -292,6 +292,7 @@ suite('Majiang.Game', ()=>{
                     kaiju: {
                         id:     id,
                         rule:   game._rule,
+                        title:  game._model.title,
                         player: game._model.player,
                         qijia:  1
                     }

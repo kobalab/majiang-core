@@ -41,8 +41,31 @@ suite('Majiang.Board', ()=>{
             assert.deepEqual(board.player, ['私','下家','対面','上家']));
         test('起家が設定されること', ()=>
             assert.equal(board.qijia, 1));
-        test('引数なしでもインスタンスが生成できること', ()=>
-            assert.ok(new Majiang.Board()));
+    });
+
+    suite('manfeng(id)', ()=>{
+        const board = new Majiang.Board({});
+        test('起家: 仮東、東一局', ()=>{
+            board.qijia = 0; board.jushu = 0;
+            assert.equal(board.menfeng(0), 0);
+            assert.equal(board.menfeng(1), 1);
+            assert.equal(board.menfeng(2), 2);
+            assert.equal(board.menfeng(3), 3);
+        });
+        test('起家: 仮東、東二局', ()=>{
+            board.qijia = 0; board.jushu = 1;
+            assert.equal(board.menfeng(0), 3);
+            assert.equal(board.menfeng(1), 0);
+            assert.equal(board.menfeng(2), 1);
+            assert.equal(board.menfeng(3), 2);
+        });
+        test('起家: 仮南、東一局', ()=>{
+            board.qijia = 1; board.jushu = 0;
+            assert.equal(board.menfeng(0), 3);
+            assert.equal(board.menfeng(1), 0);
+            assert.equal(board.menfeng(2), 1);
+            assert.equal(board.menfeng(3), 2);
+        });
     });
 
     suite('qipai(qipai)', ()=>{
