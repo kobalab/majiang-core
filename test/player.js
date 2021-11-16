@@ -25,12 +25,15 @@ function init_player(param = {}) {
 }
 
 class Player extends Majiang.Player {
+    action_kaiju(kaiju)         { this._callback() }
+    action_qipai(qipai)         { this._callback() }
     action_zimo(zimo, gangzimo) { this._callback() }
     action_dapai(dapai)         { this._callback() }
     action_fulou(fulou)         { this._callback() }
     action_gang(gang)           { this._callback() }
     action_hule(hule)           { this._callback() }
     action_pingju(pingju)       { this._callback() }
+    action_jieju(paipu)         { this._callback() }
 }
 
 
