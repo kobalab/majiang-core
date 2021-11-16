@@ -126,6 +126,12 @@ suite('Majiang.Util', ()=>{
 
         let hule;
 
+        test('パラメータ不正', ()=>{
+            assert.throws(()=>{
+                Majiang.Util.hule(Majiang.Shoupai.fromString(), 'm1', param());
+            });
+        });
+
         test('和了形以外', ()=>{
             hule = Majiang.Util.hule(
                         Majiang.Shoupai.fromString(), null, param());
