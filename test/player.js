@@ -24,6 +24,16 @@ function init_player(param = {}) {
     return player;
 }
 
+class Player extends Majiang.Player {
+    action_zimo(zimo, gangzimo) { this._callback() }
+    action_dapai(dapai)         { this._callback() }
+    action_fulou(fulou)         { this._callback() }
+    action_gang(gang)           { this._callback() }
+    action_hule(hule)           { this._callback() }
+    action_pingju(pingju)       { this._callback() }
+}
+
+
 suite('Majiang.Player', ()=>{
 
     test('クラスが存在すること',        ()=> assert.ok(Majiang.Player));
@@ -353,65 +363,53 @@ suite('Majiang.Player', ()=>{
 
     suite('action(msg, callback)', ()=>{
 
-        const player   = new Majiang.Player();
-        const callback = ()=>{};
+        const player = new Player();
+        const error  = ()=>{ throw new Error() };
 
-        test('開局 (kaiju)', ()=>{
+        test('開局 (kaiju)', (done)=>{
             const kaiju = { kaiju:
                 { id: 1, rule: Majiang.rule(), title: 'タイトル',
                   player: ['私','下家','対面','上家'], qijia: 2 }
             };
-            player.action(kaiju, callback);
-            assert.ok(player._callback);
+            player.action(kaiju, done);
         });
-        test('配牌 (qipai)', ()=>{
+        test('配牌 (qipai)', (done)=>{
             const qipai = { qipai:
                 { zhuangfeng: 1, jushu: 2, changbang: 3, lizhibang: 4,
                   defen: [ 25000, 25000, 25000, 25000 ], baopai: 's5',
                   shoupai: ['','m123p456s789z1234','',''] }
             };
-            player.action(qipai, callback);
-            assert.ok(player._callback);
+            player.action(qipai, done);
         });
-        test('自摸 (zimo)', ()=>{
-            player.action({ zimo: { l: 0, p: 'm1' } }, callback);
-            assert.ok(player._callback);
+        test('自摸 (zimo)', (done)=>{
+            player.action({ zimo: { l: 0, p: 'm1' } }, done);
         });
-        test('打牌 (dapai)', ()=>{
-            player.action({ dapai: { l: 0, p: 'm1_' } }, callback);
-            assert.ok(player._callback);
+        test('打牌 (dapai)', (done)=>{
+            player.action({ dapai: { l: 0, p: 'm1_' } }, done);
         });
-        test('副露 (fulou)', ()=>{
-            player.action({ fulou: { l: 1, m: 'm1-23' } }, callback);
-            assert.ok(player._callback);
+        test('副露 (fulou)', (done)=>{
+            player.action({ fulou: { l: 1, m: 'm1-23' } }, done);
         });
-        test('槓 (gang)', ()=>{
-            player.action({ gang: { l: 2, m: 's1111' } }, callback);
-            assert.ok(player._callback);
+        test('槓 (gang)', (done)=>{
+            player.action({ gang: { l: 2, m: 's1111' } }, done);
         });
-        test('槓自摸 (gangzimo)', ()=>{
-            player.action({ gangzimo: { l: 2, p: 's2' } }, callback);
-            assert.ok(player._callback);
+        test('槓自摸 (gangzimo)', (done)=>{
+            player.action({ gangzimo: { l: 2, p: 's2' } }, done);
         });
         test('開槓 (kaigang)', ()=>{
-            player.action({ kaigang: { baopai: 's9' } }, callback);
-            assert.ok(player._callback);
+            player.action({ kaigang: { baopai: 'm1' } }, error);
         });
-        test('和了 (hule)', ()=>{
-            player.action({ hule: {} }, callback);
-            assert.ok(player._callback);
+        test('和了 (hule)', (done)=>{
+            player.action({ hule: {} }, done);
         });
-        test('流局 (pingju)', ()=>{
-            player.action({ pingju: { name: '' } }, callback);
-            assert.ok(player._callback);
+        test('流局 (pingju)', (done)=>{
+            player.action({ pingju: { name: '' } }, done);
         });
-        test('終局 (jieju)', ()=>{
-            player.action({ jieju: {} }, callback);
-            assert.ok(player._callback);
+        test('終局 (jieju)', (done)=>{
+            player.action({ jieju: {} }, done);
         });
         test('その他', ()=>{
-            player.action({}, callback);
-            assert.ok(player._callback);
+            player.action({}, error);
         });
     });
 });
