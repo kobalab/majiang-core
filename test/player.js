@@ -175,7 +175,9 @@ suite('Majiang.Player', ()=>{
     suite('hule(hule)', ()=>{
         test('卓情報が更新されること', ()=>{
             const player = init_player();
-            player.hule({ fubaopai: ['s1'] });
+            player.hule({ l: 1, shoupai: 'm123p456s789z1122z1*',
+                          fubaopai: ['s1'] });
+            assert.equal(player._model.shoupai[1], 'm123p456s789z1122z1*')
             assert.equal(player.shan.fubaopai[0], 's1');
         });
     });
@@ -183,7 +185,8 @@ suite('Majiang.Player', ()=>{
         test('卓情報が更新されること', ()=>{
             const player = init_player();
             player.dapai({ l: 1, p: 'm3*' });
-            player.pingju({ name: '' });
+            player.pingju({ name:'', shoupai:['','','','m123p456s789z1122*'] });
+            assert.equal(player._model.shoupai[3], 'm123p456s789z1122*');
             assert.equal(player._model.lizhibang, 1);
         });
     });
@@ -403,10 +406,25 @@ suite('Majiang.Player', ()=>{
             player.action({ kaigang: { baopai: 'm1' } }, error);
         });
         test('和了 (hule)', (done)=>{
-            player.action({ hule: {} }, done);
+            const hule = { hule: {
+                l:          2,
+                shoupai:    'p7p7,z111-,z222=,z333+,z444-',
+                baojia:     3,
+                fubaopai:   null,
+                damanguan:  2,
+                defen:      64000,
+                hupai:      [ { name: '大四喜', fanshu: '**', baojia: 0 } ],
+                fenpai:     [ -32000, 0, 64000, -32000 ]
+            } };
+            player.action(hule, done);
         });
         test('流局 (pingju)', (done)=>{
-            player.action({ pingju: { name: '' } }, done);
+            const pingju = { pingju: {
+                name:    '荒牌平局',
+                shoupai: [ '', 'p2234406z333555', '', 'p11223346777z77' ],
+                fenpai:  [ -1500, 1500, -1500, 1500 ]
+            } };
+            player.action(pingju, done);
         });
         test('終局 (jieju)', (done)=>{
             player.action({ jieju: {} }, done);
