@@ -41,7 +41,11 @@ suite('Majiang.Player', ()=>{
 
     test('クラスが存在すること',        ()=> assert.ok(Majiang.Player));
 
-    test('インスタンスが生成できること', ()=> assert.ok(new Majiang.Player()));
+    suite('constructor()', ()=>{
+        const player = new Majiang.Player();
+        test('インスタンスが生成できること', ()=> assert.ok(player));
+        test('初期値が設定されること', ()=> assert.ok(player._model));
+    });
 
     suite('kaiju(kaiju)', ()=>{
         test('初期値が設定されること', ()=>{
