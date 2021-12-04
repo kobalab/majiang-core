@@ -285,6 +285,21 @@ suite('Majiang.Shoupai', ()=>{
         });
     });
 
+    suite('fromString(paistr)', ()=>{
+        test('牌姿から手牌を更新できること', ()=>
+            assert.equal('' + new Shoupai().fromString('m123p456s789z1122z2'),
+                         'm123p456s789z1122z2'));
+        test('副露あり', ()=>
+            assert.equal('' + new Shoupai().fromString('m123p456s789z2,z111='),
+                         'm123p456s789z2,z111='));
+        test('リーチ後', ()=>
+            assert.equal('' + new Shoupai().fromString('m123p456s789z1122*'),
+                         'm123p456s789z1122*'));
+        test('伏せ牌あり', ()=>
+            assert.equal('' + new Shoupai().fromString('__________,z111='),
+                         '__________,z111='));
+    });
+
     suite('zumo(p)', ()=>{
         test('萬子をツモれること', ()=>
             assert.equal('' + Shoupai('m123p456s789z4567').zimo('m1'),
