@@ -1848,9 +1848,13 @@ suite('Majiang.Game', ()=>{
 
     suite('_callback()', ()=>{
         test('終局時にコンストラクタで指定したコールバックが呼ばれること', (done)=>{
+            const callback = (paipu)=>{
+                assert.deepEqual(paipu, game._paipu);
+                done();
+            }
             const game = init_game({rule:Majiang.rule({'場数':0}),
                                     shoupai:['m123p456s789z1122','','',''],
-                                    zimo:['z2'],callback:done});
+                                    zimo:['z2'],callback:callback});
             game.zimo();
             game.hule();
             game.next();

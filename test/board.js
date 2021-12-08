@@ -41,6 +41,8 @@ suite('Majiang.Board', ()=>{
             assert.deepEqual(board.player, ['私','下家','対面','上家']));
         test('起家が設定されること', ()=>
             assert.equal(board.qijia, 1));
+        test('パラメータなしでもインスタンスが生成できること', ()=>
+            assert.ok(new Majiang.Board()));
     });
 
     suite('manfeng(id)', ()=>{
@@ -195,7 +197,10 @@ suite('Majiang.Board', ()=>{
     suite('hule(hule)', ()=>{
         const board = init_board();
         board.zimo({ l: 0, p: 'm1' });
-        board.hule({ fubaopai: ['s9'] });
+        board.hule({ l: 0, shoupai: 'm123p456s789z1122z2*', fubaopai: ['s9'] });
+        test('和了者の手牌が設定されること', ()=>{
+            assert.equal(board.shoupai[0], 'm123p456s789z1122z2*')
+        });
         test('裏ドラを参照できること', ()=>
                 assert.equal(board.shan.fubaopai[0], 's9'));
         test('ダブロンの際に持ち点の移動が反映されていること', ()=>{
@@ -219,11 +224,16 @@ suite('Majiang.Board', ()=>{
     });
 
     suite('pingju(pingju)', ()=>{
+        test('倒牌した手牌が設定されること', ()=>{
+            const board = init_board();
+            board.pingju({ name: '', shoupai: ['','m123p456s789z1122','','']});
+            assert.equal(board.shoupai[1], 'm123p456s789z1122');
+        });
         test('リーチ宣言後の流局でリーチが成立すること', ()=>{
             const board = init_board();
             board.zimo({ l: 0, p: 'm1' });
             board.dapai({ l: 0, p: 'm1_*' });
-            board.pingju({ name: '荒牌平局' });
+            board.pingju({ name: '荒牌平局', shoupai: [] });
             assert.equal(board.defen[board.player_id[0]], 9000);
             assert.equal(board.lizhibang, 5);
         });
@@ -231,7 +241,7 @@ suite('Majiang.Board', ()=>{
             const board = init_board();
             board.zimo({ l: 0, p: 'm1' });
             board.dapai({ l: 0, p: 'm1_*' });
-            board.pingju({ name: '三家和' });
+            board.pingju({ name: '三家和', shoupai: [] });
             assert.equal(board.defen[board.player_id[0]], 10000);
             assert.equal(board.lizhibang, 4);
         });
