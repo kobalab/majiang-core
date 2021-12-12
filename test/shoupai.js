@@ -552,14 +552,22 @@ suite('Majiang.Shoupai', ()=>{
         test('リーチ後はツモ切りしかできないこと', ()=>
             assert.deepEqual(Shoupai('m123p456s789z1234m1*').get_dapai(),
                              ['m1_']));
-        test('赤牌を単独の牌として区別すること', ()=>
+        test('赤牌を単独の牌として区別すること', ()=>{
             assert.deepEqual(Shoupai('m123p405s789z11123').get_dapai(),
                              ['m1','m2','m3','p4','p0','p5','s7','s8','s9',
-                              'z1','z2','z3_']));
-        test('手出しとツモ切りを区別すること', ()=>
+                              'z1','z2','z3_']);
+            assert.deepEqual(Shoupai('m123p45s789z11123p0').get_dapai(),
+                             ['m1','m2','m3','p4','p5','s7','s8','s9',
+                              'z1','z2','z3','p0_']);
+        });
+        test('手出しとツモ切りを区別すること', ()=>{
             assert.deepEqual(Shoupai('m123p45s789z11123p5').get_dapai(),
                              ['m1','m2','m3','p4','p5','s7','s8','s9',
-                              'z1','z2','z3', 'p5_']));
+                              'z1','z2','z3', 'p5_']);
+            assert.deepEqual(Shoupai('m123p405s789z1112p0').get_dapai(),
+                             ['m1','m2','m3','p4','p0','p5','s7','s8','s9',
+                              'z1','z2','p0_']);
+        });
         test('伏せ牌のみの手牌では空配列を返すこと', ()=>{
             assert.deepEqual(Shoupai('______________').get_dapai(), []);
             assert.deepEqual(Shoupai('___________,m123-,').get_dapai(), []);
