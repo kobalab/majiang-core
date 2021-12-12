@@ -1,3 +1,8 @@
+### v0.1.4 / 2021-12-12
+
+ - Majiang.Shoupai
+   - 赤牌をツモったとき、get_dapai() が誤った値を返すバグを修正
+
 ### v0.1.3 / 2021-12-09
 
  - Majiang.Shoupai
