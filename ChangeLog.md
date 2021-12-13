@@ -1,3 +1,8 @@
+### v0.1.5 / 2021-12-13
+
+ - Majiang.Player
+   - get tingpai() → get hulepai() に名称変更
+
 ### v0.1.4 / 2021-12-12
 
  - Majiang.Shoupai
