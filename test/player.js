@@ -107,8 +107,8 @@ suite('Majiang.Player', ()=>{
             assert.ok(! player._diyizimo);
         });
         test('自身の打牌に和了牌がある場合、フリテンとなること', ()=>{
-            const player = init_player({shoupai:'m123p456s789z11222'});
-            player.dapai({ l: 0, p: 'm1' });
+            const player = init_player({shoupai:'m123p406s789z11222'});
+            player.dapai({ l: 0, p: 'p0' });
             assert.ok(! player._neng_rong);
         });
         test('自身の打牌でフリテンが解除されること', ()=>{
@@ -124,8 +124,8 @@ suite('Majiang.Player', ()=>{
             assert.ok(! player._neng_rong);
         });
         test('和了牌を見逃した場合、フリテンとなること', ()=>{
-            const player = init_player({shoupai:'m123p456s789z1122'});
-            player.dapai({ l: 1, p: 'z1' });
+            const player = init_player({shoupai:'m123p46s789z11122'});
+            player.dapai({ l: 1, p: 'p0' });
             assert.ok(! player._neng_rong);
         });
     });
