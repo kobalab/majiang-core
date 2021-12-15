@@ -2146,8 +2146,8 @@ suite('Majiang.Game', ()=>{
     });
 
     suite('static get_dapai(rule, shoupai)', ()=>{
-        let shoupai = Majiang.Shoupai.fromString('m1234p567,z111=,s789-')
-                                     .fulou('m1-23');
+        let shoupai = Majiang.Shoupai.fromString('m5678p567,z111=,s789-')
+                                     .fulou('m0-67');
         test('喰い替えなし', ()=>
             assert.deepEqual(
                 Majiang.Game.get_dapai(
@@ -2157,12 +2157,12 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(
                 Majiang.Game.get_dapai(
                     Majiang.rule({'喰い替え許可レベル':1}), shoupai),
-                ['m4','p5','p6','p7']));
+                ['m8','p5','p6','p7']));
         test('現物喰い替えもあり', ()=>
             assert.deepEqual(
                 Majiang.Game.get_dapai(
                     Majiang.rule({'喰い替え許可レベル':2}), shoupai),
-                ['m1','m4','p5','p6','p7']));
+                ['m5','m8','p5','p6','p7']));
     });
 
     suite('static get_chi_mianzi(rule, shoupai, p, paishu)', ()=>{
