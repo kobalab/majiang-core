@@ -4,25 +4,7 @@ const Majiang = require('../');
 
 const data = require('./data/hule.json');
 
-function param(opt = {}) {
-
-    let param = {
-        rule:       Majiang.rule(),
-        zhuangfeng: 0,
-        menfeng:    1,
-        hupai:      {},
-        baopai:     [],
-        fubaopai:   null,
-        jicun:      { changbang: 0, lizhibang: 0 }
-    };
-
-    for (let key in opt) {
-        if (param.jicun[key] !== undefined) param.jicun[key] = opt[key];
-        else if (param[key]  !== undefined) param[key]       = opt[key];
-        else                                param.hupai[key] = opt[key];
-    }
-    return param;
-}
+const param = Majiang.Util.hule_param;
 
 suite('Majiang.Util', ()=>{
 
@@ -1407,9 +1389,10 @@ suite('Majiang.Util', ()=>{
 
         test('和了点計算: 10000パターン', ()=>{
             for (let t of data) {
+                t.in.param.rule = Majiang.rule();
                 hule = Majiang.Util.hule(
                             Majiang.Shoupai.fromString(t.in.shoupai),
-                            t.in.rongpai, param(t.in.param));
+                            t.in.rongpai, t.in.param);
                 assert.deepEqual(hule, t.out, t.in.shoupai);
             }
         });
