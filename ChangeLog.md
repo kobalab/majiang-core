@@ -1,3 +1,10 @@
+### v0.1.8 / 2021-12-17
+
+ - Majiang.Util
+   - 関数 hule_param() を追加
+ - Majiang.Game
+   - ゲーム開始時の牌譜の point, rank を未定義に変更
+
 ### v0.1.7 / 2021-12-16
 
  - Majiang.Player
