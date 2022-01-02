@@ -601,6 +601,10 @@ suite('Majiang.Shoupai', ()=>{
             assert.deepEqual(Shoupai('m206p456s789z12,m345-,').get_dapai(),
                              ['m6','p4','p5','p6','s7','s8','s9','z1','z2']);
         });
+        test('赤牌によるポンの際に正しく喰い替え判定すること', ()=>{
+            assert.deepEqual(Shoupai('m25p1s12678,z666+,m550-,').get_dapai(),
+                             ['m2','p1','s1','s2','s6','s7','s8']);
+        });
         test('喰替えのため打牌できない場合があること', ()=>{
             assert.deepEqual(Shoupai('m14,p456-,s789-,z111+,m234-,')
                                                             .get_dapai(),
