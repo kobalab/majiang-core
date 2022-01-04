@@ -117,6 +117,12 @@ suite('Majiang.Player', ()=>{
             player.dapai({ l: 0, p: 'z3_' });
             assert.ok(player._neng_rong);
         });
+        test('リーチ宣言まではフリテンが解除されること', ()=>{
+            const player = init_player({shoupai:'m123p456s789z11232'});
+            player._neng_rong = false;
+            player.dapai({ l: 0, p: 'z3*' });
+            assert.ok(player._neng_rong);
+        });
         test('リーチ後はフリテンが解除されないこと', ()=>{
             const player = init_player({shoupai:'m123p456s789z11223*'});
             player._neng_rong = false;
