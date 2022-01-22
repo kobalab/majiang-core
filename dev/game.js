@@ -74,8 +74,8 @@ class Player {
 
 module.exports = class Game extends Majiang.Game {
 
-    constructor(script) {
-        super([0,1,2,3].map(x=> new Player()));
+    constructor(script, rule) {
+        super([0,1,2,3].map(x=> new Player()), null, rule);
         this._model.title = script.title;
         this._model.player = script.player;
         this._script = script;
