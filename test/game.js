@@ -2242,6 +2242,7 @@ suite('Majiang.Game', ()=>{
         let shoupai2 = Majiang.Shoupai.fromString('m1112p456s789z111m1*');
         let shoupai3 = Majiang.Shoupai.fromString('m23p567s33345666s3*');
         let shoupai4 = Majiang.Shoupai.fromString('s1113445678999s1*');
+        let shoupai5 = Majiang.Shoupai.fromString('m23s77789s7*,s5550,z6666');
 
         test('リーチ後の暗槓なし', ()=>{
             const rule = Majiang.rule({'リーチ後暗槓許可レベル':0});
@@ -2253,6 +2254,8 @@ suite('Majiang.Game', ()=>{
                 Majiang.Game.get_gang_mianzi(rule, shoupai3, null, 1), []);
             assert.deepEqual(
                 Majiang.Game.get_gang_mianzi(rule, shoupai4, null, 1), []);
+            assert.deepEqual(
+                Majiang.Game.get_gang_mianzi(rule, shoupai5, null, 1), []);
         });
         test('リーチ後の牌姿の変わる暗槓なし', ()=>{
             const rule = Majiang.rule({'リーチ後暗槓許可レベル':1});
@@ -2265,6 +2268,8 @@ suite('Majiang.Game', ()=>{
                 Majiang.Game.get_gang_mianzi(rule, shoupai3, null, 1), []);
             assert.deepEqual(
                 Majiang.Game.get_gang_mianzi(rule, shoupai4, null, 1), []);
+            assert.deepEqual(
+                Majiang.Game.get_gang_mianzi(rule, shoupai5, null, 1), []);
         });
         test('リーチ後の待ちの変わる暗槓なし', ()=>{
             const rule = Majiang.rule({'リーチ後暗槓許可レベル':2});
@@ -2279,6 +2284,8 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(
                 Majiang.Game.get_gang_mianzi(rule, shoupai4, null, 1),
                 ['s1111']);
+            assert.deepEqual(
+                Majiang.Game.get_gang_mianzi(rule, shoupai5, null, 1), []);
         });
         test('ハイテイはカンできない', ()=>{
             const rule = Majiang.rule();
