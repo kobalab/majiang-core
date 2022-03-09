@@ -56,9 +56,11 @@ function make_reply(l, log) {
         else if (data.gang)
             reply.push(l == data.gang.l  ? { gang:  data.gang.m  } : {});
         else if (data.pingju) {
-            if      (data.pingju.name == '九種九牌') reply.push({ daopai: '-' });
-            else if (data.pingju.name.match(/^三家和/)
-                    && data.pingju.shoupai[l])     reply.push({ hule: '-' });
+            if (data.pingju.shoupai[l]) {
+                if (data.pingju.name.match(/^三家和/))
+                        reply.push({ hule: '-' });
+                else    reply.push({ daopai: '-' });
+            }
         }
         else if (data.hule)
             if (l == data.hule.l) reply.push({ hule: '-' });

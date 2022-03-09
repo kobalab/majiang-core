@@ -689,6 +689,7 @@ suite('Majiang.Game', ()=>{
             game.gang('m1111');
             game.gangzimo();
             assert.equal(game.model.shan.baopai.length, 1);
+            assert.ok(! game._gang);
         });
     });
 
