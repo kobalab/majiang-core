@@ -959,7 +959,7 @@ suite('Majiang.Game', ()=>{
             game.pingju();
             assert.equal(last_paipu(game).pingju.name, '荒牌平局');
             assert.equal(last_paipu(game).pingju.shoupai
-                                            .filter(s=>s).length, 2)
+                                            .filter(s=>s).length, 1)
             assert.deepEqual(game._fenpei, [0,0,0,0]);
         });
         test('テンパイ連荘', ()=>{
@@ -1038,6 +1038,34 @@ suite('Majiang.Game', ()=>{
             game.pingju();
             assert.equal(last_paipu(game).pingju.name, '流し満貫');
             assert.deepEqual(game._fenpei, [8000,4000,-6000,-6000]);
+        });
+        test('ノーテン罰なしのルールの場合、'
+            + 'リーチ者と親以外は手牌を開かないこと',()=>
+        {
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       'ノーテン罰あり':false}),
+                                    shoupai:['m567999s4466777',
+                                             'm05p123s56z333*,s8888',
+                                             'm11p789s06,z555-,p406-',
+                                             '']});
+            game.pingju();
+            assert.deepEqual(last_paipu(game).pingju.shoupai,
+                             [ 'm567999s4466777', 'm05p123s56z333*,s8888',
+                               '', ''])
+        });
+        test('ノーテン罰なしで和了連荘のルールの場合、'
+            + 'リーチ者以外は手牌を開かないこと', ()=>
+        {
+            const game = init_game({rule:Majiang.rule({'流し満貫あり':false,
+                                                       'ノーテン罰あり':false,
+                                                       '連荘方式':1}),
+                                    shoupai:['m567999s4466777',
+                                             'm05p123s56z333*,s8888',
+                                             'm11p789s06,z555-,p406-',
+                                             '']});
+            game.pingju();
+            assert.deepEqual(last_paipu(game).pingju.shoupai,
+                             [ '', 'm05p123s56z333*,s8888', '', ''])
         });
     });
 

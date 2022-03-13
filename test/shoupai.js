@@ -628,10 +628,14 @@ suite('Majiang.Shoupai', ()=>{
             assert.ifError(Shoupai('m123p456s789z12345').get_chi_mianzi('m1-'));
             assert.ifError(Shoupai('m123p456s789z12,z333=,')
                                                         .get_chi_mianzi('m1-'));
+            assert.ifError(Shoupai('______________').get_chi_mianzi('m1-'));
         });
-        test('チーできるメンツがない場合', ()=>
+        test('チーできるメンツがない場合', ()=>{
             assert.deepEqual(Shoupai('m123p456s789z1234').get_chi_mianzi('m5-'),
-                             []));
+                             []);
+            assert.deepEqual(Shoupai('_____________').get_chi_mianzi('m5-'),
+                             []);
+        });
         test('チーできるメンツが1つの場合', ()=>
             assert.deepEqual(Shoupai('m123p456s789z1234').get_chi_mianzi('m3-'),
                              ['m123-']));
@@ -736,11 +740,15 @@ suite('Majiang.Shoupai', ()=>{
                                                     .get_peng_mianzi('m1+'));
             assert.ifError(Shoupai('m112p456s789z12,z333=,')
                                                     .get_peng_mianzi('m1='));
+            assert.ifError(Shoupai('______________').get_peng_mianzi('m1-'));
         });
-        test('ポンできるメンツがない場合', ()=>
+        test('ポンできるメンツがない場合', ()=>{
             assert.deepEqual(Shoupai('m123p456s789z1234')
                                                     .get_peng_mianzi('m1+'),
-                             []));
+                             []);
+            assert.deepEqual(Shoupai('_____________').get_peng_mianzi('m1='),
+                             []);
+        });
         test('下家からポンできること', ()=>
             assert.deepEqual(Shoupai('m112p456s789z1234')
                                                     .get_peng_mianzi('m1+'),
@@ -804,10 +812,14 @@ suite('Majiang.Shoupai', ()=>{
                                         .get_gang_mianzi('m1+'));
             assert.ifError(Shoupai('m111p456s789z12,z333=,')
                                         .get_gang_mianzi('m1+'));
+            assert.ifError(Shoupai('______________').get_gang_mianzi('m1-'));
         });
-        test('大明槓できるメンツがない場合', ()=>
+        test('大明槓できるメンツがない場合', ()=>{
             assert.deepEqual(Shoupai('m123p456s789z1122')
-                                        .get_gang_mianzi('z1+'),[]));
+                                        .get_gang_mianzi('z1+'),[]);
+            assert.deepEqual(Shoupai('_____________')
+                                        .get_gang_mianzi('z1='),[]);
+        });
         test('下家から大明槓できること', ()=>
             assert.deepEqual(Shoupai('m111p456s789z1234')
                                         .get_gang_mianzi('m1+'), ['m1111+']));
@@ -851,10 +863,14 @@ suite('Majiang.Shoupai', ()=>{
             assert.ifError(Shoupai('m1111p555s999z123').get_gang_mianzi());
             assert.ifError(Shoupai('m1111p555s999,z333=').get_gang_mianzi());
             assert.ifError(Shoupai('m11112p555s999,z333=,').get_gang_mianzi());
+            assert.ifError(Shoupai('_____________').get_gang_mianzi());
         });
-        test('暗槓できるメンツがない場合', ()=>
+        test('暗槓できるメンツがない場合', ()=>{
             assert.deepEqual(Shoupai('m123p456s789z12345')
-                                        .get_gang_mianzi(), []));
+                                        .get_gang_mianzi(), []);
+            assert.deepEqual(Shoupai('______________')
+                                        .get_gang_mianzi(), []);
+        });
         test('萬子で暗槓できること', ()=>
             assert.deepEqual(Shoupai('m1111p456s789z1234')
                                         .get_gang_mianzi(), ['m1111']));
@@ -894,10 +910,15 @@ suite('Majiang.Shoupai', ()=>{
                                         .get_gang_mianzi());
             assert.ifError(Shoupai('m12p555s999,z333=,m111-,')
                                         .get_gang_mianzi());
+            assert.ifError(Shoupai('__________,m111-,')
+                                        .get_gang_mianzi());
         });
-        test('加槓できるメンツがない場合', ()=>
+        test('加槓できるメンツがない場合', ()=>{
             assert.deepEqual(Shoupai('m123p456s789z12,z777+')
-                                        .get_gang_mianzi(), []));
+                                        .get_gang_mianzi(), []);
+            assert.deepEqual(Shoupai('___________,z777+')
+                                        .get_gang_mianzi(), []);
+        });
         test('萬子で加槓できること', ()=>
             assert.deepEqual(Shoupai('m1p456s789z1234,m111+')
                                         .get_gang_mianzi(), ['m111+1']));
