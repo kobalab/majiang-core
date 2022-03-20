@@ -1428,6 +1428,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.dapai('m5*');
             game.next();
+            assert.deepEqual(game._view._say, ['rong', 2])
             assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, [2]);
         });
@@ -1439,6 +1440,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.dapai('m5*');
             game.next();
+            assert.deepEqual(game._view._say, ['rong', 1])
             assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, []);
         });
@@ -1450,6 +1452,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{hule:'-'}]);
             game.dapai('m5*');
             game.next();
+            assert.deepEqual(game._view._say, ['rong', 3])
             assert.equal(last_paipu(game).pingju.name, '三家和');
             assert.deepEqual(last_paipu(game).pingju.shoupai,
                              ['','m23446p45688s345',
@@ -1465,6 +1468,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{hule:'-'}]);
             game.dapai('m5*');
             game.next();
+            assert.deepEqual(game._view._say, ['rong', 3])
             assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, [2, 3]);
         });
@@ -1786,6 +1790,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.gang('m505-5');
             game.next();
+            assert.deepEqual(game._view._say, ['rong', 2]);
             assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, [2]);
         });
@@ -1799,6 +1804,7 @@ suite('Majiang.Game', ()=>{
             set_reply(game, [{},{hule:'-'},{hule:'-'},{}]);
             game.gang('m505-5');
             game.next();
+            assert.deepEqual(game._view._say, ['rong', 1]);
             assert.equal(last_paipu(game).hule.l, 1);
             assert.deepEqual(game._hule, []);
         });
