@@ -713,6 +713,19 @@ suite('Majiang.Game', ()=>{
             }
         });
 
+        test('通知のタイミングを変更できること', (done)=>{
+            const game = init_game({shoupai:['m123p456s789z1122','','',''],
+                                    zimo:['z2']});
+            game.wait = 20;
+            game.zimo();
+            MSG = [];
+            game._sync = false;
+            game.stop(done);
+            game.hule();
+            assert.equal(MSG.length, 0);
+            setTimeout(()=>assert.equal(MSG.length, 4), 20);
+        });
+
         test('立直・一発', ()=>{
             const game = init_game({shoupai:['m123p456s789z1122','_','','']});
             game._diyizimo = false;
@@ -878,6 +891,18 @@ suite('Majiang.Game', ()=>{
                 let id = game.model.player_id[l];
                 assert.equal(MSG[id].pingju.name, '九種九牌');
             }
+        });
+
+        test('通知のタイミングを変更できること', (done)=>{
+            const game = init_game();
+            game.wait = 20;
+            game.zimo();
+            MSG = [];
+            game._sync = false;
+            game.stop(done);
+            game.pingju('九種九牌')
+            assert.equal(MSG.length, 0);
+            setTimeout(()=>assert.equal(MSG.length, 4), 20);
         });
 
         test('全員テンパイ', ()=>{
@@ -1234,6 +1259,17 @@ suite('Majiang.Game', ()=>{
                 let id = game.model.player_id[l];
                 assert.ok(MSG[id].jieju);
             }
+        });
+
+        test('通知のタイミングを変更できること', (done)=>{
+            const game = init_game();
+            game.wait = 20;
+            MSG = [];
+            game._sync = false;
+            game.stop(done);
+            game.jieju();
+            assert.equal(MSG.length, 0);
+            setTimeout(()=>assert.equal(MSG.length, 4), 20);
         });
 
         test('同点の場合は起家に近い方を上位とする', ()=>{
