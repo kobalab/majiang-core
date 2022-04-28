@@ -72,6 +72,11 @@ suite('Majiang.Util', ()=>{
                 Majiang.Util.hule_mianzi(
                     Majiang.Shoupai.fromString('m111234567899'), 'm9='),
                 []));
+        test('複数の和了形としない(順子優先)', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('m111123p789999z1z1'), null),
+                [ ['z11_!','m123','m111','p789','p999'] ]));
         test('複数の和了形(二盃口か七対子か)', ()=>
             assert.deepEqual(
                 Majiang.Util.hule_mianzi(
