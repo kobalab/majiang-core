@@ -112,6 +112,8 @@ suite('Majiang.Shoupai', ()=>{
             assert.ok(new Majiang.Shoupai(['_'])));
         test('不正な牌を含む配牌で例外が発生すること', ()=>
             assert.throws(()=>new Majiang.Shoupai(['z0'])));
+        test('5枚目の牌を含む配牌で例外が発生すること', ()=>
+            assert.throws(()=>new Majiang.Shoupai(['m1','m1','m1','m1','m1'])));
     });
 
     suite('static fromString(paistr)', ()=>{
