@@ -2485,9 +2485,13 @@ suite('Majiang.Game', ()=>{
 
         const rule = Majiang.rule();
 
-        test('第一ツモでない場合、九種九牌とならない', ()=>{
+        test('第一巡でない場合、九種九牌とならない', ()=>{
             let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
             assert.ok(! Majiang.Game.allow_pingju(rule, shoupai, false));
+        });
+        test('ツモ後でない場合、九種九牌とならない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123459z1234567');
+            assert.ok(! Majiang.Game.allow_pingju(rule, shoupai, true));
         });
         test('途中流局なし場合、九種九牌とならない', ()=>{
             let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
