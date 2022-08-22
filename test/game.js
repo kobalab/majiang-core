@@ -2046,7 +2046,8 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.get_gang_mianzi(), ['m1111','z111=1']);
         });
         test('ハイテイ牌は暗槓もしくは加槓できないこと', ()=>{
-            const game = init_game({shoupai:['m1111p456s78z1,z111=']});
+            const game = init_game({shoupai:['m1111p4567s78,z111='],
+                                    zimo:['z1']});
             game.zimo();
             while (game.model.shan.paishu) game.model.shan.zimo();
             assert.deepEqual(game.get_gang_mianzi(), []);
