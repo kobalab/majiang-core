@@ -360,7 +360,7 @@ suite('Majiang.Player', ()=>{
     suite('allow_pingju(shoupai)', ()=>{
         test('九種九牌で流せること', ()=>{
             const player = init_player();
-            let shoupai = Majiang.Shoupai.fromString('m123459z1234567');
+            let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
             assert.ok(player.allow_pingju(shoupai));
         });
         test('最初のツモ巡をすぎた場合、流せないこと', ()=>{

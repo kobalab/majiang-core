@@ -98,6 +98,8 @@ suite('Majiang.Shoupai', ()=>{
             assert.ifError(Majiang.Shoupai.valid_mianzi('m123')));
         test('m111   : 不正', ()=>
             assert.ifError(Majiang.Shoupai.valid_mianzi('m111')));
+        test('z111=0 : 不正', ()=>
+            assert.ifError(Majiang.Shoupai.valid_mianzi('z111=0')));
     });
 
     suite('constructor(qipai)', ()=>{
@@ -112,6 +114,8 @@ suite('Majiang.Shoupai', ()=>{
             assert.ok(new Majiang.Shoupai(['_'])));
         test('不正な牌を含む配牌で例外が発生すること', ()=>
             assert.throws(()=>new Majiang.Shoupai(['z0'])));
+        test('5枚目の牌を含む配牌で例外が発生すること', ()=>
+            assert.throws(()=>new Majiang.Shoupai(['m1','m1','m1','m1','m1'])));
     });
 
     suite('static fromString(paistr)', ()=>{
