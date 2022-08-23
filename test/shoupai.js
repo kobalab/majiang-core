@@ -98,6 +98,8 @@ suite('Majiang.Shoupai', ()=>{
             assert.ifError(Majiang.Shoupai.valid_mianzi('m123')));
         test('m111   : 不正', ()=>
             assert.ifError(Majiang.Shoupai.valid_mianzi('m111')));
+        test('z111=0 : 不正', ()=>
+            assert.ifError(Majiang.Shoupai.valid_mianzi('z111=0')));
     });
 
     suite('constructor(qipai)', ()=>{
