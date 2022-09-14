@@ -5,9 +5,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "lib/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
   "types": "types/index.d.ts",
   "scripts": {
+    "build": "vite build",
     "test": "mocha -u tdd",
     "test:cover": "nyc -r lcov -r text npm test"
   },
