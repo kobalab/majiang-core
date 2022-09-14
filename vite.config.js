@@ -11,6 +11,11 @@ export default {
       fileName: "[format]/index",
     },
     minify: false,
+    rollupOptions:{
+      output: {
+        exports: "named"
+      }
+    }
   },
   resolve: {
     alias: { "@": resolve(__dirname, "lib") },
