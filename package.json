@@ -6,6 +6,7 @@
     "access": "public"
   },
   "main": "lib/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "mocha -u tdd",
     "test:cover": "nyc -r lcov -r text npm test"
