@@ -10,7 +10,7 @@
   "types": "types/index.d.ts",
   "scripts": {
     "build": "vite build",
-    "test": "mocha -u tdd",
+    "test": "npm run build && mocha -u tdd",
     "test:cover": "nyc -r lcov -r text npm test"
   },
   "repository": {
