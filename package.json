@@ -6,7 +6,7 @@
     "access": "public"
   },
   "main": "dist/cjs/index.js",
-  "module": "dist/es/index.js",
+  "module": "dist/es/index.mjs",
   "types": "types/index.d.ts",
   "scripts": {
     "build": "vite build",

@@ -8,7 +8,7 @@ export default {
       entry: resolve(__dirname, "lib/index.js"),
       name: "MajiangCore",
       formats: ["es", "cjs"],
-      fileName: "[format]/index.js",
+      fileName: "[format]/index",
     },
     minify: false,
   },
