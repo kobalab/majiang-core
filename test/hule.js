@@ -107,6 +107,11 @@ suite('Majiang.Util', ()=>{
                     Majiang.Shoupai.fromString('s1113445678999s2')),
                 [ ['s99','s111','s2_!34','s456','s789'],
                   ['s11134456789992_!'] ]));
+        test('バグ: 暗槓しているの5枚目の牌で和了', ()=>
+            assert.deepEqual(
+                Majiang.Util.hule_mianzi(
+                    Majiang.Shoupai.fromString('s4067999z444s8,s8888')),
+                [ ['s99','s456','s78_!9','z444','s8888'] ]));
     });
 
     suite('hule(shoupai, rongpai, param)', ()=>{
