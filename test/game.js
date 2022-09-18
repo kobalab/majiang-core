@@ -2041,7 +2041,8 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.get_gang_mianzi(2), []);
         });
         test('現在の手番が暗槓もしくは加槓できる面子を返すこと', ()=>{
-            const game = init_game({shoupai:['m1111p456s78z1,z111=']});
+            const game = init_game({shoupai:['m1111p4569s78,z111='],
+                                    zimo:['z1']});
             game.zimo();
             assert.deepEqual(game.get_gang_mianzi(), ['m1111','z111=1']);
         });
