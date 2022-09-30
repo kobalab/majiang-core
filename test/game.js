@@ -2510,6 +2510,39 @@ suite('Majiang.Game', ()=>{
         });
     });
 
+    suite('static allow_no_daopai(rule, shoupai, paishu)', ()=>{
+
+        const rule = Majiang.rule({'ノーテン宣言あり': true});
+
+        test('最終打牌以外はノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 1));
+            assert.ok(! Majiang.Game.allow_no_daopai(
+                                                rule, shoupai.zimo('z3'), 0));
+        });
+        test('ノーテン宣言ありのルールでない場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(! Majiang.Game.allow_no_daopai(
+                                                Majiang.rule(), shoupai, 0));
+        });
+        test('リーチしている場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456p789z1122*');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+        test('テンパイしていない場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456p789z1123');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+        test('形式テンパイと認められない牌姿の場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456p789z1111');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+        test('ノーテン宣言', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+    });
+
     suite('シナリオ通りに局が進むこと', ()=>{
         for (let paipu of script) {
             test(paipu.title, ()=>{
