@@ -376,6 +376,34 @@ suite('Majiang.Player', ()=>{
             assert.ok(! player.allow_pingju(shoupai));
         });
     });
+    suite('allow_no_daopai(shoupai)', ()=>{
+        test('ノーテン宣言できること', ()=>{
+            const player = init_player(
+                                {rule:Majiang.rule({'ノーテン宣言あり':true})});
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z1122');
+            while (player.shan.paishu) player.shan.zimo();
+            assert.ok(player.allow_no_daopai(shoupai));
+        });
+        test('ノーテン宣言なしの場合、ノーテン宣言できないこと', ()=>{
+            const player = init_player();
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z1122');
+            while (player.shan.paishu) player.shan.zimo();
+            assert.ok(! player.allow_no_daopai(shoupai));
+        });
+        test('テンパイしていない場合、ノーテン宣言できないこと', ()=>{
+            const player = init_player(
+                                {rule:Majiang.rule({'ノーテン宣言あり':true})});
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z1123');
+            while (player.shan.paishu) player.shan.zimo();
+            assert.ok(! player.allow_no_daopai(shoupai));
+        });
+        test('流局していない場合、ノーテン宣言できないこと', ()=>{
+            const player = init_player(
+                                {rule:Majiang.rule({'ノーテン宣言あり':true})});
+            let shoupai = Majiang.Shoupai.fromString('m123p456s789z1122');
+            assert.ok(! player.allow_no_daopai(shoupai));
+        });
+    });
 
     suite('action(msg, callback)', ()=>{
 
