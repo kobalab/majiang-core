@@ -1,3 +1,10 @@
+## v0.3.0 / 2022-10-01
+
+  - Majiang.Game
+    - クラスメソッド allow_no_daopai() を追加
+  - Majiang.Player
+    - メソッド allow_no_daopai() を追加
+
 ### v0.2.11 / 2022-09-15
 
  - Majiang.Util
