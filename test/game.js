@@ -2041,7 +2041,8 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game.get_gang_mianzi(2), []);
         });
         test('現在の手番が暗槓もしくは加槓できる面子を返すこと', ()=>{
-            const game = init_game({shoupai:['m1111p456s78z1,z111=']});
+            const game = init_game({shoupai:['m1111p4569s78,z111='],
+                                    zimo:['z1']});
             game.zimo();
             assert.deepEqual(game.get_gang_mianzi(), ['m1111','z111=1']);
         });
@@ -2506,6 +2507,39 @@ suite('Majiang.Game', ()=>{
         test('九種九牌', ()=>{
             let shoupai = Majiang.Shoupai.fromString('m1234569z1234567');
             assert.ok(Majiang.Game.allow_pingju(rule, shoupai, true));
+        });
+    });
+
+    suite('static allow_no_daopai(rule, shoupai, paishu)', ()=>{
+
+        const rule = Majiang.rule({'ノーテン宣言あり': true});
+
+        test('最終打牌以外はノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 1));
+            assert.ok(! Majiang.Game.allow_no_daopai(
+                                                rule, shoupai.zimo('z3'), 0));
+        });
+        test('ノーテン宣言ありのルールでない場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(! Majiang.Game.allow_no_daopai(
+                                                Majiang.rule(), shoupai, 0));
+        });
+        test('リーチしている場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456p789z1122*');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+        test('テンパイしていない場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456p789z1123');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+        test('形式テンパイと認められない牌姿の場合、ノーテン宣言できない', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456p789z1111');
+            assert.ok(! Majiang.Game.allow_no_daopai(rule, shoupai, 0));
+        });
+        test('ノーテン宣言', ()=>{
+            let shoupai = Majiang.Shoupai.fromString('m123p456z1122,s789-');
+            assert.ok(Majiang.Game.allow_no_daopai(rule, shoupai, 0));
         });
     });
 
