@@ -275,8 +275,8 @@ suite('Majiang.Game', ()=>{
 
         test('起家が設定されること', ()=>{
             MSG =[];
-            game.kaiju(1);
-            assert.equal(game._model.qijia, 1);
+            game.kaiju(0);
+            assert.equal(game._model.qijia, 0);
         });
         test('牌譜が初期化されること', ()=>{
             assert.equal(game._paipu.title, game._model.title);
@@ -294,7 +294,7 @@ suite('Majiang.Game', ()=>{
                         rule:   game._rule,
                         title:  game._model.title,
                         player: game._model.player,
-                        qijia:  1
+                        qijia:  0
                     }
                 };
                 assert.deepEqual(MSG[id], msg);
