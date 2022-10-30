@@ -1306,6 +1306,12 @@ suite('Majiang.Game', ()=>{
             assert.deepEqual(game._paipu.rank, [3,4,1,2]);
             assert.deepEqual(game._paipu.point, ['-15','-35','45','5']);
         });
+
+        test('ハンドラがある場合、それを呼び出すこと', (done)=>{
+            const game = init_game();
+            game.handler = done;
+            game.jieju();
+        });
     });
 
     suite('reply_kaiju()', ()=>{
