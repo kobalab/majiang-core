@@ -201,9 +201,15 @@ suite('Majiang.Player', ()=>{
         });
     });
     suite('jieju(paipu)', ()=>{
+        test('卓情報が更新されること', ()=>{
+            const player = init_player();
+            const paipu = { defen: [ 10000, 20000, 30000, 40000 ] };
+            player.jieju(paipu);
+            assert.deepEqual(player._model.defen, paipu.defen);
+        });
         test('牌譜を取得していること', ()=>{
             const player = init_player();
-            player.jieju({});
+            player.jieju({ defen: [] });
             assert.ok(player._paipu);
         });
     });
@@ -465,7 +471,7 @@ suite('Majiang.Player', ()=>{
             player.action(pingju, done);
         });
         test('終局 (jieju)', (done)=>{
-            player.action({ jieju: {} }, done);
+            player.action({ jieju: { defen: [] } }, done);
         });
         test('その他', ()=>{
             player.action({}, error);
