@@ -246,4 +246,16 @@ suite('Majiang.Board', ()=>{
             assert.equal(board.lizhibang, 4);
         });
     });
+
+    suite('jieju(paipu)', ()=>{
+        const board = init_board();
+        board.lunban = 0;
+        const paipu = {
+            defen: [ 17100, 36900, 36000, 10000 ]
+        };
+        board.jieju(paipu);
+        test('終局時の持ち点が反映されること', ()=>
+                assert.deepEqual(board.defen, [ 17100, 36900, 36000, 10000 ]));
+        test('手番が初期化されること', ()=> assert.equal(board.lunban, -1));
+    });
 });
