@@ -1,3 +1,10 @@
+## v0.5.0 / 2022-11-06
+
+  - Majiang.Board
+    - メソッド jieju() を追加
+  - Majiang.Player
+    - Majiang.Board のメソッド jieju() の呼び出しを追加
+
 ## v0.4.0 / 2022-10-31
 
   - Majiang.Game
