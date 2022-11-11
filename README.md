@@ -2,6 +2,8 @@
 
 麻雀基本ライブラリ
 
+手牌の操作、シャンテン数・和了点計算、局進行・卓情報の管理、思考ルーチンの雛形を含む基本クラス群を提供します。
+
 ## インストール
 ```sh
 $ npm i @kobalab/majiang-core
@@ -20,7 +22,7 @@ const Majiang = require('@kobalab/majiang-core');
 | ``Majiang.He``      | 捨て牌を表現するクラス               |
 | ``Majiang.Util``    | シャンテン数計算、和了点計算ルーチン |
 | ``Majiang.Game``    | 局進行を実現するクラス               |
-| ``Majiang.Board``   | 卓に関する情報を表現するクラス       |
+| ``Majiang.Board``   | 卓情報を更新するクラス               |
 | ``Majiang.Player``  | 対局者を実現する基底クラス           |
 
 - [API仕様](https://github.com/kobalab/majiang-core/wiki)
