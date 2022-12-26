@@ -186,7 +186,6 @@ suite('Majiang.Game', ()=>{
         test('停止すること', ()=>{
             game.stop();
             assert.ok(game._stop);
-            assert.ok(! game._timeout_id);
             game._reply = [1,1,1,1];
             game.next();
         });
