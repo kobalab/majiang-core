@@ -36,6 +36,13 @@ class Player extends Majiang.Player {
     action_jieju(paipu)         { this._callback() }
 }
 
+class View {
+    kaiju  (param) { this._param = { kaiju:   param } }
+    redraw (param) { this._param = { redraw:  param } }
+    update (param) { this._param = { update:  param } }
+    say (...param) { this._say   = param              }
+    summary(param) { this._param = { summary: param } }
+}
 
 suite('Majiang.Player', ()=>{
 
@@ -44,7 +51,7 @@ suite('Majiang.Player', ()=>{
     suite('constructor()', ()=>{
         const player = new Majiang.Player();
         test('インスタンスが生成できること', ()=> assert.ok(player));
-        test('初期値が設定されること', ()=> assert.ok(player._model));
+        test('初期値が設定されること', ()=> assert.ok(player.model));
     });
 
     suite('kaiju(kaiju)', ()=>{
@@ -57,7 +64,15 @@ suite('Majiang.Player', ()=>{
 
             assert.equal(player._id, 1);
             assert.deepEqual(player._rule, Majiang.rule());
-            assert.equal(player._model.title, 'タイトル');
+            assert.equal(player.model.title, 'タイトル');
+        });
+        test('表示処理が呼び出されること', ()=>{
+            const player = new Majiang.Player();
+            player.view = new View();
+            const kaiju = { id: 1, rule: Majiang.rule(), title: 'タイトル',
+                            player: ['私','下家','対面','上家'], qijia: 2 };
+            player.kaiju(kaiju);
+            assert.deepEqual(player._view._param, { kaiju: 1 });
         });
     });
     suite('qipai(qipai)', ()=>{
@@ -80,6 +95,18 @@ suite('Majiang.Player', ()=>{
             assert.equal(player.shoupai, 'm123p456s789z1234');
             assert.equal(player.he._pai.length, 0);
         });
+        test('表示処理が呼び出されること', ()=>{
+            const player = new Majiang.Player();
+            player.view = new View();
+            const kaiju = { id: 1, rule: Majiang.rule(), title: 'タイトル',
+                            player: ['私','下家','対面','上家'], qijia: 2 };
+            player.kaiju(kaiju);
+            const qipai = { zhuangfeng: 1, jushu: 2, changbang: 3, lizhibang: 4,
+                            defen: [ 25000, 25000, 25000, 25000 ], baopai: 's5',
+                            shoupai: ['','m123p456s789z1234','',''] };
+            player.qipai(qipai);
+            assert.deepEqual(player._view._param, { redraw: null });
+        });
     });
     suite('zimo(zimo)', ()=>{
         test('卓情報が更新されること', ()=>{
@@ -91,6 +118,16 @@ suite('Majiang.Player', ()=>{
             const player = init_player();
             player.zimo({ l: 0, p: 'z5' }, true);
             assert.equal(player._n_gang, 1);
+        });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player();
+            player.view = new View();
+            player.zimo({ l: 0, p: 'z5' });
+            assert.deepEqual(player._view._param,
+                                { update: { zimo: { l: 0, p: 'z5' } } });
+            player.zimo({ l: 1, p: '' }, true);
+            assert.deepEqual(player._view._param,
+                                { update: { gangzimo: { l: 1, p: '' } } });
         });
     });
     suite('dapai(dapai)', ()=>{
@@ -134,6 +171,13 @@ suite('Majiang.Player', ()=>{
             player.dapai({ l: 1, p: 'p0' });
             assert.ok(! player._neng_rong);
         });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player({shoupai:'m123p456s789z1234z5'});
+            player.view = new View();
+            player.dapai({ l: 0, p: 'z5_' });
+            assert.deepEqual(player._view._param,
+                                { update: { dapai: { l: 0, p: 'z5_' } } });
+        });
     });
     suite('fulou(fulou)', ()=>{
         test('卓情報が更新されること', ()=>{
@@ -148,6 +192,14 @@ suite('Majiang.Player', ()=>{
             assert.ok(player._diyizimo);
             player.fulou({ l: 1, m: 'z333=' });
             assert.ok(! player._diyizimo);
+        });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player({shoupai:'m123p456s789z1134'});
+            player.view = new View();
+            player.dapai({ l: 2, p: 'z1' });
+            player.fulou({ l: 0, m: 'z111=' });
+            assert.deepEqual(player._view._param,
+                                { update: { fulou: { l: 0, m: 'z111=' } } });
         });
     });
     suite('gang(gang)', ()=>{
@@ -174,6 +226,13 @@ suite('Majiang.Player', ()=>{
             player.gang({ l: 3, m: 'm555-0' });
             assert.ok(! player._neng_rong);
         });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player({shoupai:'m123p456s788z12,z111='});
+            player.view = new View();
+            player.gang({ l: 0, m: 'z111=1' });
+            assert.deepEqual(player._view._param,
+                                { update: { gang: { l: 0, m: 'z111=1' } } });
+        });
     });
     suite('kaigang(kaigang)', ()=>{
         test('卓情報が更新されること', ()=>{
@@ -181,14 +240,31 @@ suite('Majiang.Player', ()=>{
             player.kaigang({ baopai: 'p1' });
             assert.equal(player.shan.baopai.pop(), 'p1');
         });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player();
+            player.view = new View();
+            player.kaigang({ baopai: 'p1' });
+            assert.deepEqual(player._view._param,
+                                { update: { kaigang: { baopai: 'p1' } } });
+        });
     });
     suite('hule(hule)', ()=>{
         test('卓情報が更新されること', ()=>{
             const player = init_player();
             player.hule({ l: 1, shoupai: 'm123p456s789z1122z1*',
                           fubaopai: ['s1'] });
-            assert.equal(player._model.shoupai[1], 'm123p456s789z1122z1*')
+            assert.equal(player.model.shoupai[1], 'm123p456s789z1122z1*')
             assert.equal(player.shan.fubaopai[0], 's1');
+        });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player();
+            player.view = new View();
+            player.hule({ l: 1, shoupai: 'm123p456s789z1122z1*',
+                          fubaopai: ['s1'] });
+            assert.deepEqual(player._view._param,
+                                { update: { hule: {
+                                    l: 1, shoupai:  'm123p456s789z1122z1*',
+                                    fubaopai: ['s1'] } } });
         });
     });
     suite('pingju(pingju)', ()=>{
@@ -196,8 +272,19 @@ suite('Majiang.Player', ()=>{
             const player = init_player();
             player.dapai({ l: 1, p: 'm3*' });
             player.pingju({ name:'', shoupai:['','','','m123p456s789z1122*'] });
-            assert.equal(player._model.shoupai[3], 'm123p456s789z1122*');
-            assert.equal(player._model.lizhibang, 1);
+            assert.equal(player.model.shoupai[3], 'm123p456s789z1122*');
+            assert.equal(player.model.lizhibang, 1);
+        });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player();
+            player.view = new View();
+            player.dapai({ l: 1, p: 'm3*' });
+            player.pingju({ name:'', shoupai:['','','','m123p456s789z1122*'] });
+            assert.deepEqual(player._view._param,
+                                { update: { pingju: {
+                                    name:'',
+                                    shoupai:['','','','m123p456s789z1122*']
+                                } } });
         });
     });
     suite('jieju(paipu)', ()=>{
@@ -205,12 +292,19 @@ suite('Majiang.Player', ()=>{
             const player = init_player();
             const paipu = { defen: [ 10000, 20000, 30000, 40000 ] };
             player.jieju(paipu);
-            assert.deepEqual(player._model.defen, paipu.defen);
+            assert.deepEqual(player.model.defen, paipu.defen);
         });
         test('牌譜を取得していること', ()=>{
             const player = init_player();
             player.jieju({ defen: [] });
             assert.ok(player._paipu);
+        });
+        test('表示処理が呼び出されること', ()=>{
+            const player = init_player();
+            player.view = new View();
+            const paipu = { defen: [ 10000, 20000, 30000, 40000 ] };
+            player.jieju(paipu);
+            assert.deepEqual(player._view._param, { summary: paipu });
         });
     });
 
@@ -322,14 +416,14 @@ suite('Majiang.Player', ()=>{
         });
         test('トビ終了あり', ()=>{
             const player = init_player();
-            player._model.defen[player._id] = 900;
+            player.model.defen[player._id] = 900;
             let shoupai = Majiang.Shoupai.fromString('m223p456s789z11122');
             assert.ok(! player.allow_lizhi(shoupai));
         });
         test('トビ終了なし', ()=>{
             const player = init_player(
                                     {rule:Majiang.rule({'トビ終了あり':false})});
-            player._model.defen[player._id] = 900;
+            player.model.defen[player._id] = 900;
             let shoupai = Majiang.Shoupai.fromString('m223p456s789z11122');
             assert.ok(player.allow_lizhi(shoupai));
         });
