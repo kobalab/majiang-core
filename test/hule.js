@@ -1412,6 +1412,17 @@ suite('Majiang.Util', ()=>{
 
         let hule;
 
+        suite('連風牌は２符', ()=>{
+            test('連風牌を２符とする', ()=>{
+                hule = Majiang.Util.hule(
+                            Majiang.Shoupai.fromString(
+                                    'm123p123z1z1,s1-23,z555='),
+                            null,
+                            param({menfeng:0,
+                                   rule:Majiang.rule({'連風牌は2符':true})}));
+                assert.equal(hule.fu, 30);
+            });
+        });
         suite('クイタンなし', ()=>{
             test('クイタンは役とならない', ()=>{
                 hule = Majiang.Util.hule(
