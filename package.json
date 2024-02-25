@@ -1,6 +1,6 @@
 {
   "name": "@kobalab/majiang-core",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "麻雀基本ライブラリ",
   "publishConfig": {
     "access": "public"
