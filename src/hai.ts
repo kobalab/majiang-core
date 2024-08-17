@@ -17,10 +17,9 @@ export class Hai {
    * @param num 牌の番号
    */
   constructor (private _type: EHaiType, private _num: number) {
-    const e = new Error(`Invalid Hai. Type: ${this._type} num: ${this._num}`);
-    if (this._num < 0) { throw e; }
-    if (this._type !== HaiType.jihai && this._num > 9) { throw e; }
-    else if (this._type === HaiType.jihai && this._num > 7) { throw e; }
+    if (this._num < 0) { throw new Error(`Invalid Hai. Type: ${this._type} num: ${this._num}`); }
+    if (this._type !== HaiType.jihai && this._num > 9) { throw new Error(`Invalid Hai. Type: ${this._type} num: ${this._num}`); }
+    else if (this._type === HaiType.jihai && this._num > 7) { throw new Error(`Invalid Hai. Type: ${this._type} num: ${this._num}`); }
   }
 
   /**
