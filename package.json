@@ -1,29 +1,24 @@
 {
-  "name": "@kobalab/majiang-core",
-  "version": "1.2.1",
+  "name": "@yanapiidxer/mahjong-core",
+  "version": "2.0.0",
   "description": "麻雀基本ライブラリ",
   "publishConfig": {
     "access": "public"
   },
-  "main": "lib/index.js",
   "scripts": {
     "test": "jest",
     "test:cover": "nyc -r lcov -r text npm test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kobalab/majiang-core.git"
+    "url": "git+https://github.com/YanaPIIDXer/majiang-core.git"
   },
-  "keywords": [
-    "麻雀",
-    "電脳麻将"
-  ],
-  "author": "Satoshi Kobayashi",
+  "author": "Satoshi Kobayashi, Forked by YanaPIIDXer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kobalab/majiang-core/issues"
+    "url": "https://github.com/YanaPIIDXer/majiang-core/issues"
   },
-  "homepage": "https://github.com/kobalab/majiang-core#readme",
+  "homepage": "https://github.com/YanaPIIDXer/majiang-core#readme",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^22.4.0",
@@ -35,6 +30,6 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@kobalab/majiang-core": "file:"
+    "@yanapiidxer/mahjong-core": "file:"
   }
 }
