@@ -25,7 +25,10 @@
   },
   "homepage": "https://github.com/kobalab/majiang-core#readme",
   "devDependencies": {
+    "@types/node": "^22.4.0",
     "mocha": "^10.2.0",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "tsc": "^2.0.4",
+    "typescript": "^5.5.4"
   }
 }
