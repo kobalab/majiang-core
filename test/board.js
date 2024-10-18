@@ -332,6 +332,11 @@ suite('Majiang.Board', ()=>{
             assert.equal(board.changbang, 4);
             assert.equal(board.lizhibang, 4);
         });
+        test('和了・流局がないときは処理を行わないこと', ()=>{
+            const board = init_board();
+            board.last();
+            assert.deepEqual(board.defen, [ 20000, 30000, 36000, 10000 ]);
+        });
     });
 
     suite('jieju(paipu)', ()=>{
