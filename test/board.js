@@ -247,6 +247,98 @@ suite('Majiang.Board', ()=>{
         });
     });
 
+    suite('last()', ()=>{
+        test('和了時に持ち点の移動が反映されていること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 1, p: 'p4' });
+            board.hule({ l: 1, shoupai: 'p06s12344p4,z777-,p333+', baojia: null,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2000,
+                         hupai: [ { name: '役牌 中', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ -1300, 6900, -800, -800 ] });
+            board.last();
+            assert.deepEqual(board.defen, [ 26900, 29200, 35200, 8700 ]);
+        });
+        test('子の和了時に本場が0になること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 2, p: '' });
+            board.dapai({ l: 2, p: 'p4' });
+            board.hule({ l: 1, shoupai: 'p06s12344p4,z777-,p333+', baojia: 2,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2000,
+                         hupai: [ { name: '役牌 中', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 0, 6900, -2900, 0 ] });
+            board.last();
+            assert.equal(board.changbang, 0);
+            assert.equal(board.lizhibang, 0);
+        });
+        test('親の和了時に本場が1増加すること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 2, p: '' });
+            board.dapai({ l: 2, p: 'p4' });
+            board.hule({ l: 0, shoupai: 'p06s12344p4,z777-,p333+', baojia: 2,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2900,
+                         hupai: [ { name: '役牌 中', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 7200, 0, -3200, 0 ] });
+            board.last();
+            assert.equal(board.changbang, 4);
+            assert.equal(board.lizhibang, 0);
+        });
+        test('ダブロン(親の和了なし)が正しく処理されること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 1, p: '' });
+            board.dapai({ l: 1, p: 'p4_' });
+            board.hule({ l: 2, shoupai: 'm444678p44s33p4,s505=', baojia: 1,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2000,
+                         hupai: [ { name: '断幺九', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 0, -2900, 6900, 0 ] });
+            board.hule({ l: 3, shoupai: 'p06s12344p4,z777-,p333+', baojia: 1,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2000,
+                         hupai: [ { name: '役牌 中', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 0, -2000, 0, 2000 ] });
+            board.last();
+            assert.deepEqual(board.defen, [ 15100, 36900, 38000, 10000 ]);
+            assert.equal(board.changbang, 0);
+            assert.equal(board.lizhibang, 0);
+        });
+        test('ダブロン(親の和了あり)が正しく処理されること', ()=>{
+            const board = init_board();
+            board.zimo({ l: 1, p: '' });
+            board.dapai({ l: 1, p: 'p4_' });
+            board.hule({ l: 2, shoupai: 'm444678p44s33p4,s505=', baojia: 1,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2000,
+                         hupai: [ { name: '断幺九', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 0, -2900, 6900, 0 ] });
+            board.hule({ l: 0, shoupai: 'p06s12344p4,z777-,p333+', baojia: 1,
+                         fubaopai: null, fu: 30, fanshu: 2, defen: 2900,
+                         hupai: [ { name: '役牌 中', fanshu: 1 },
+                                  { name: '赤ドラ', fanshu: 1 } ],
+                         fenpei: [ 2900, -2900, 0, 0 ] });
+            board.last();
+            assert.deepEqual(board.defen, [ 14200, 36900, 36000, 12900 ]);
+            assert.equal(board.changbang, 4);
+            assert.equal(board.lizhibang, 0);
+        });
+        test('流局時に持ち点の移動、本場が反映されていること', ()=>{
+            const board = init_board();
+            board.pingju({ name: '', shoupai: ['','','',''],
+                           fenpei: [ 1500, 1500, -1500, -1500 ] });
+            board.last();
+            assert.deepEqual(board.defen, [ 21500, 28500, 34500, 11500 ]);
+            assert.equal(board.changbang, 4);
+            assert.equal(board.lizhibang, 4);
+        });
+        test('和了・流局がないときは処理を行わないこと', ()=>{
+            const board = init_board();
+            board.last();
+            assert.deepEqual(board.defen, [ 20000, 30000, 36000, 10000 ]);
+        });
+    });
+
     suite('jieju(paipu)', ()=>{
         const board = init_board();
         board.lunban = 0;
