@@ -27,6 +27,7 @@ const Majiang = require('@kobalab/majiang-core');
 | ``Majiang.Board``   | 卓情報を更新するクラス               |
 | ``Majiang.Player``  | 対局者を実現する基底クラス           |
 
+## API仕様
 - [API仕様](https://github.com/kobalab/majiang-core/wiki)
 
 ## ライセンス
