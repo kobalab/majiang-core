@@ -101,6 +101,16 @@ suite('Majiang.Board', ()=>{
                                 assert.equal(board.he.map(he=>he._pai.length)
                                                      .reduce((x,y)=>x+y), 0));
         test('手番が初期化されること', ()=> assert.equal(board.lunban, -1));
+        test('ドラが未確定でも処理できること', ()=>{
+            qipai.baopai = '';
+            board.qipai(qipai);
+            assert.equal(board.shan.baopai.length, 0);
+        });
+        test('ドラが複数でも処理できること', ()=>{
+            qipai.baopai = ['s1','p9'];
+            board.qipai(qipai);
+            assert.deepEqual(board.shan.baopai, qipai.baopai);
+        });
     });
 
     suite('zimo(zimo)', ()=>{
