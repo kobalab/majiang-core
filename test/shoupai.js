@@ -132,11 +132,17 @@ suite('Majiang.Shoupai', ()=>{
                                             'm1,p123-,s555=,z777+7,m9999'),
                                             'm1,p123-,s555=,z777+7,m9999'));
         test('伏せ牌がある場合でもインスタンスが生成できること', ()=>
-            assert.equal(''+Majiang.Shoupai.fromString('m123p456s789____'),
-                                                       '____m123p456s789'));
+            assert.equal(''+Majiang.Shoupai.fromString('____m123p456s789'),
+                                                       'm123p456s789____'));
         test('伏せ牌がある場合でもインスタンスが生成できること(副露あり)', ()=>
-            assert.equal(''+Majiang.Shoupai.fromString('m123p456____,s789-'),
-                                                       '____m123p456,s789-'));
+            assert.equal(''+Majiang.Shoupai.fromString('____m123p456,s789-'),
+                                                       'm123p456____,s789-'));
+        test('伏せ牌がある場合でもインスタンスが生成できること(超過あり)',()=>
+            assert.equal(''+Majiang.Shoupai.fromString('____m123p456s789z12'),
+                                                       'm123p456s789____z1'));
+        test('伏せ牌がある場合でもインスタンスが生成できること(伏せ牌が超過)',()=>
+            assert.equal(''+Majiang.Shoupai.fromString('m123p456s789z1_____'),
+                                                       'm123p456s789z1____'));
         test('少牌の場合でもインスタンスが生成できること', ()=>
             assert.equal(''+Majiang.Shoupai.fromString('m111p222s333'),
                                                        'm111p222s333'));
